@@ -18,3 +18,4 @@ server/lib64
 server/lib64/*
 server/pyvenv.cfg
 server/utils/__pycache__
+server/venv
