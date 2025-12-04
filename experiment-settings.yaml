@@ -1,0 +1,6 @@
+# Experiment settings
+experiment-repo: "demo-experiment"  # github repo name
+organization: "github-by-dramco"    # github org
+tiles: "segmentA"                   # group name, single tile, or space-separated list
+test-connectivity: True             # set True if you want to test tile connectivity before continuing.
+halt-on-connectivity-failure: True  # set False if you want to continue with only the active tiles
