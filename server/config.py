@@ -17,6 +17,9 @@ PROJECT_DIR = _project_dir
 UTILS_DIR = _tile_management_server_dir
 PLAYBOOK_DIR = _tile_management_playbook_dir
 INVENTORY_PATH = _inventory_path
+TILE_MANAGEMENT_REPO_ORG = "techtile-by-dramco"
+TILE_MANAGEMENT_REPO_NAME = "tile-management"
+TILE_MANAGEMENT_REPO_DIR = "/home/pi/tile-management"
 
 def check_tile_management_repo():
     # We look for the tile-management repo
@@ -25,3 +28,10 @@ def check_tile_management_repo():
         print("Did you run ./setup-server.sh with CLONE_TILE_MANAGEMENT_REPO=1 ?")
         return False
     return True
+
+ERRORS = {
+    "REPO_ERROR": -1,
+    "NO_TILES_ERROR": -2,
+    "CONNECTIVITY_ERROR": -3,
+    "ARGUMENT_ERROR": -4
+}

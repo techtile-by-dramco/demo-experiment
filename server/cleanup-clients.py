@@ -1,14 +1,27 @@
 import os
 import sys
 import yaml
+import argparse
 import config
+
+parser = argparse.ArgumentParser(
+    description="Cleanup the home directory of the tiles' raspberry pi's."
+)
+
+parser.add_argument(
+    "--ansible-output", "-a",
+    action="store_true",
+    help="Enable ansible output"
+)
+
+args = parser.parse_args()
 
 # We start by setting some paths
 settings_path = os.path.join(config.PROJECT_DIR, "experiment-settings.yaml")
 
 # Check if the tile-management repo is in the default location (no use in continuing if it's not)
 if not config.check_tile_management_repo():
-    sys.exit(-1)
+    sys.exit(config.ERRORS["REPO_ERROR"])
 
 # Import code from the tile-management repo
 sys.path.append(config.UTILS_DIR)
@@ -24,7 +37,7 @@ with open(settings_path, "r") as f:
 tiles = experiment_settings.get("tiles", "")
 if len(tiles) == 0:
     print("The experiment doesn't target any tiles.")
-    sys.exit(-2)
+    sys.exit(config.ERRORS["NO_TILES_ERROR"])
 test_connectivity = experiment_settings.get("test-connectivity", True)
 halt_on_connectivity_failure = experiment_settings.get("halt-on-connectivity-failure", True)
 
@@ -45,7 +58,7 @@ if test_connectivity:
         config.INVENTORY_PATH,
         extra_vars=None,
         hosts=tiles,
-        mute_output=True,
+        mute_output=not(args.ansible_output),
         suppress_warnings=True,
         cleanup=True
     )
@@ -65,27 +78,80 @@ if test_connectivity:
                         inactive_list += " "
                     inactive_list += str(t)
             print("Inactive tiles:", inactive_list)
-            sys.exit(-3)
+            sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
         else:
             print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
             
 prev_nr_active_tiles = nr_active_tiles
 
 print("Cleaning tile home-directory ... ")
-print("TODO: handle experiment-service. -  For now, we don't clean tile-management.")
 playbook_path = os.path.join(config.PLAYBOOK_DIR, "clean-home.yaml")
 
 (tiles, nr_active_tiles) = run_playbook(
-  config.PROJECT_DIR,
-  playbook_path,
-  config.INVENTORY_PATH,
-  extra_vars=None,
-  hosts=tiles,
-  mute_output=True,
-  suppress_warnings=True,
-  cleanup=True)
+    config.PROJECT_DIR,
+    playbook_path,
+    config.INVENTORY_PATH,
+    extra_vars=None,
+    hosts=tiles,
+    mute_output=not(args.ansible_output),
+    suppress_warnings=True,
+    cleanup=True
+)
 
 if not (nr_active_tiles == prev_nr_active_tiles):
-  print("Unable to connect to all tiles.")
+    print("Unable to connect to all tiles.")
+    if halt_on_connectivity_failure:
+        print("Aborting (halt-on-connectivity-failure = True)")
+        # Print active tiles
+        active_list = tiles.split(' ')
+        print("Active tiles:", tiles)
+        # Print inactive tiles
+        inactive_list = ""
+        for t in host_list:
+            if str(t) not in active_list:
+                if len(inactive_list) > 0:
+                    inactive_list += " "
+                inactive_list += str(t)
+        print("Inactive tiles:", inactive_list)
+        sys.exit(ERRORS["CONNECTIVITY_ERROR"])
+
+prev_nr_active_tiles = nr_active_tiles
 
 print("Cleaned the home directory of tiles(s):", tiles)
+
+print("Disabling experiment-launcher.service ... ")
+playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
+
+(tiles, nr_active_tiles) = run_playbook(
+    config.PROJECT_DIR,
+    playbook_path,
+    config.INVENTORY_PATH,
+    extra_vars={
+        'script_path': os.path.join(config.TILE_MANAGEMENT_REPO_DIR, 'tiles/install-experiment.sh'),
+        'sudo': 'yes',
+        'script_args': 'remove'
+    },
+    hosts=tiles,
+    mute_output=not(args.ansible_output),
+    suppress_warnings=True,
+    cleanup=True
+)
+
+if not (nr_active_tiles == prev_nr_active_tiles):
+    print("Unable to connect to all tiles.")
+    if halt_on_connectivity_failure:
+        print("Aborting (halt-on-connectivity-failure = True)")
+        # Print active tiles
+        active_list = tiles.split(' ')
+        print("Active tiles:", tiles)
+        # Print inactive tiles
+        inactive_list = ""
+        for t in host_list:
+            if str(t) not in active_list:
+                if len(inactive_list) > 0:
+                    inactive_list += " "
+                inactive_list += str(t)
+        print("Inactive tiles:", inactive_list)
+        sys.exit(ERRORS["CONNECTIVITY_ERROR"])
+        
+print("Done.")
