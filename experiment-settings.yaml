@@ -14,7 +14,7 @@ extra_packages:                     # list of extra packages to be installed on 
   - python3-scipy
   - python3-zmq
 
-client_script_name: "log-cpu.py"
+client_script_name: "uhd-receive.py"
 script_args:
 #  - "--message"
 #  - "Hello"
