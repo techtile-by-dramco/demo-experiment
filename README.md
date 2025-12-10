@@ -37,6 +37,18 @@ source bin/activate
 ### 2. Client setup
 Getting the clients ready to run the experiment involves several steps, which are currently handled the ```setup-clients.py``` script.
 
+This script reads several settings from ```experiment-settings.yaml```. Make sure these are set correctly.
+
+#### Most important settings
+* ```tiles```: list of clients (or predefined groups such as "ceiling", "segmentA", etc.). This list is to be presented as a string where each name is separated by a space.
+* ```extra_packages```:  list of extra packages to be installed on the client (needed to run the experiment client script).
+* ```experiment_repo``` and ```organisation```: names of your GitHub repository and organisation. If you have forked your own experiment repo under "https://github.com/yourname/my-techtile-experiment", then:
+```yaml
+experiment_repo: "my-techtile-experiment"
+organisation: "yourname"
+```
+
+#### Usage
 ```bash
 python setup-clients.py -h
 usage: setup-clients.py [-h] [--ansible-output] [--skip-apt] [--install-only] [--repos-only] [--check-uhd-only]
@@ -58,8 +70,6 @@ options:
   --repos-only, -r      Only pull the required repositories
   --check-uhd-only, -c  Only check if the UHD python API is available
 ```
-
-This script reads several settings from ```experiment-settings.yaml```. Make sure these are set correctly.
 
 ```bash
 python update-experiment.py -h
