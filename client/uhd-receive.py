@@ -73,8 +73,9 @@ print(f"Received {num_rx} samples")
 rms = np.sqrt(np.mean(np.abs(buffer_samps[:num_rx])**2))
 power_db = 20 * np.log10(rms)
 
-print(f"Measured RMS: {rms:.6f}")
-print(f"Power (dBFS): {power_db:.2f} dBFS")
+with open("power.txt", "w") as f:
+    f.write(f"Measured RMS: {rms:.6f}")
+    f.write(f"Power (dBFS): {power_db:.2f} dBFS")
 
 ########################################
 # Done
