@@ -65,7 +65,8 @@ The ```setup-clients.py``` script performs several actions:
 
 Each of these steps can be run separately as well.
 
-**Important remark** Sometimes it is required to reboot the clients after the installation of UHD. This can be done using:
+#### Important remark
+Sometimes it is required to reboot the clients after the installation of UHD. This can be done using:
 ```
 python reboot-clients.py
 ```
@@ -114,3 +115,13 @@ options:
 ```
 
 ### 4. Experiment clean-up
+```
+python cleanup-clients.py -h
+usage: cleanup-clients.py [-h] [--ansible-output]
+
+Cleanup the home directory of the tiles' raspberry pi's.
+
+options:
+  -h, --help            show this help message and exit
+  --ansible-output, -a  Enable ansible output
+```
