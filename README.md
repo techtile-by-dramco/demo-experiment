@@ -11,11 +11,12 @@ Your Linux workstation will henceforth be called "server". Each physical tile of
 
 Once you have created your own repository it is good to take note of the directory structure.
 
-#### Folder description
+#### Repo structure
 **client:** This folder is for code that needs to run on the client. This is also a good place to store, for example, custom FPGA images for the USRP.
 **data:** This folder is for raw experiment data.
 **results:** This folder for processed data.
 **server:** This folder is for code that runs on the server.
+**experiment-settings.yaml:** Experiment configuration file.
 
 #### Semi-automated server setup
 You can use the ```server/setup-server.sh``` script to help you setup your server so it is able to run all the necessary scripts.
@@ -34,6 +35,8 @@ source bin/activate
 ```
 
 ### 2. Client setup
+Getting the clients ready to run the experiment involves several steps, which are currently handled the ```setup-clients.py``` script.
+
 ```bash
 python setup-clients.py -h
 usage: setup-clients.py [-h] [--ansible-output] [--skip-apt] [--install-only] [--repos-only] [--check-uhd-only]
@@ -54,4 +57,21 @@ options:
   --install-only, -i    Run apt update/upgrade and apt install <extra-packages> (defined in experiment-settings.yaml)
   --repos-only, -r      Only pull the required repositories
   --check-uhd-only, -c  Only check if the UHD python API is available
+```
+
+This script reads several settings from ```experiment-settings.yaml```. Make sure these are set correctly.
+
+```bash
+python update-experiment.py -h
+usage: update-experiment.py [-h] [--ansible-output]
+
+Notify the tiles' rpi's of any updated experiment settings
+
+This involves:
+    - pulling the latest version of the experiment repo
+    - installing the experiment client script
+
+options:
+  -h, --help            show this help message and exit
+  --ansible-output, -a  Enable ansible output
 ```
