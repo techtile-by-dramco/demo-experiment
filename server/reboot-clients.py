@@ -5,14 +5,7 @@ import argparse
 import config
 
 parser = argparse.ArgumentParser(
-    description="""
-Notify the tiles' rpi's of any updated experiment settings
-
-This involves:
-    - pulling the latest version of the experiment repo
-    - installing the experiment client script
-""",
-    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description="Reboot the raspberry pi's on the tiles."
 )
 
 parser.add_argument(
@@ -47,19 +40,10 @@ if len(tiles) == 0:
     sys.exit(config.ERRORS["NO_TILES_ERROR"])
 test_connectivity = experiment_settings.get("test_connectivity", True)
 halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_failure", True)
-extra_packages = experiment_settings.get("extra_packages", "")
-experiment_repo = experiment_settings.get("experiment_repo", "")
-organisation = experiment_settings.get("organisation", "")
-client_script = experiment_settings.get("script", "")
-script_full_path = os.path.join("/home/pi", experiment_repo, "experiment-settings.yaml")
-script_working_dir = os.path.join("/home/pi", experiment_repo, "data")
 
 # host list can be used to identify individual tiles from group names
 # We don't need it to run ansible playbooks, but it is a first check to see if the tiles are specified correctly
 host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
-
-# reassign tiles, wrongly specified tiles have been removed from list
-tiles = " ".join(host_list)
 print("Working on", len(host_list) ,"tile(s):", tiles)
 
 # First we test connectivity
@@ -95,60 +79,19 @@ if test_connectivity:
                     inactive_list += str(t)
             print("Inactive tiles:", inactive_list)
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
-    
-    print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
             
 prev_nr_active_tiles = nr_active_tiles
 
-print("Pulling the experiment repo:", experiment_repo ,"... ")
-playbook_path = os.path.join(config.PLAYBOOK_DIR, "pull-repo.yaml")
+print("Rebooting ... ")
+playbook_path = os.path.join(config.PLAYBOOK_DIR, "reboot.yaml")
 
 (tiles, nr_active_tiles) = run_playbook(
     config.PROJECT_DIR,
     playbook_path,
     config.INVENTORY_PATH,
-    extra_vars={
-        'org_name': organisation,
-        'repo_name': experiment_repo
-    },
-    hosts=tiles,
-    mute_output= not(args.ansible_output),
-    suppress_warnings=True,
-    cleanup=True
-)
-
-if not (nr_active_tiles == prev_nr_active_tiles):
-    print("Unable to connect to all tiles.")
-    if halt_on_connectivity_failure:
-        print("Aborting (halt_on_connectivity_failure = True)")
-        # Print active tiles
-        active_list = tiles.split(' ')
-        print("Active tiles:", tiles)
-        # Print inactive tiles
-        inactive_list = ""
-        for t in host_list:
-            if str(t) not in active_list:
-                if len(inactive_list) > 0:
-                    inactive_list += " "
-                inactive_list += str(t)
-        print("Inactive tiles:", inactive_list)
-        sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
-
-print("Pulled repository on tiles(s):", tiles)
-prev_nr_active_tiles = nr_active_tiles
-    
-print("Installing client script:", client_script, "... ")
-playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
-
-(tiles, nr_active_tiles) = run_playbook(
-    config.PROJECT_DIR,
-    playbook_path,
-    config.INVENTORY_PATH,
-    extra_vars={
-        'script_path': os.path.join(config.TILE_MANAGEMENT_REPO_DIR, 'tiles/install-experiment.sh'),
-        'sudo': 'yes',
-        'script_args': ' '.join(['install', script_full_path, script_working_dir])
-    },
+    extra_vars=None,
     hosts=tiles,
     mute_output=not(args.ansible_output),
     suppress_warnings=True,
@@ -172,6 +115,8 @@ if not (nr_active_tiles == prev_nr_active_tiles):
         print("Inactive tiles:", inactive_list)
         sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
 
-print("Updated experiment client script on tiles(s):", tiles)
+prev_nr_active_tiles = nr_active_tiles
+
+print("Rebooted tiles(s):", tiles)
 
 print("Done.")

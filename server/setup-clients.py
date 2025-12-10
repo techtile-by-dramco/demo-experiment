@@ -91,7 +91,7 @@ with open(settings_path, "r") as f:
 tiles = experiment_settings.get("tiles", "")
 if len(tiles) == 0:
     print("The experiment doesn't target any tiles.")
-    sys.exit(ERRORS["NO_TILES_ERROR"])
+    sys.exit(config.ERRORS["NO_TILES_ERROR"])
 test_connectivity = experiment_settings.get("test_connectivity", True)
 halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_failure", True)
 extra_packages = experiment_settings.get("extra_packages", "")
