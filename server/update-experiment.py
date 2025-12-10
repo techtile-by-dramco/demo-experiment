@@ -1,57 +1,176 @@
 import os
 import sys
 import yaml
+import argparse
+import config
+
+parser = argparse.ArgumentParser(
+    description="""
+Notify the tiles' rpi's of any updated experiment settings
+
+This involves:
+    - pulling the latest version of the experiment repo
+    - installing the experiment client script
+""",
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+)
+
+parser.add_argument(
+    "--ansible-output", "-a",
+    action="store_true",
+    help="Enable ansible output"
+)
+
+args = parser.parse_args()
 
 # We start by setting some paths
-script_dir = os.path.dirname(os.path.abspath(__file__))
-project_dir = os.path.dirname(script_dir)
-home = os.environ["HOME"]
-tile_management_base_dir = os.path.join(home, "tile-management")
-tile_management_scripts_dir = os.path.join(tile_management_base_dir, "server")
-tile_management_playbook_dir = os.path.join(tile_management_base_dir, "playbooks")
-tile_management_inventory_dir = os.path.join(tile_management_base_dir, "inventory")
-settings_path = os.path.join(project_dir, "experiment-settings.yaml")
+settings_path = os.path.join(config.PROJECT_DIR, "experiment-settings.yaml")
 
-# We look for the tile-management repo
-if not os.path.isdir(tile_management_base_dir):
-  print("Could not find tile-management repository at the default location (", tile_management_base_dir, ")")
-  print("Did you run ./setup-server.sh with CLONE_TILE_MANAGEMENT_REPO=1 ?")
-  sys.exit(-1)
-
-# Path to the tiles inventory (inside the tile-management repo)
-inventory_path = os.path.join(tile_management_inventory_dir, "hosts.yaml")
+# Check if the tile-management repo is in the default location (no use in continuing if it's not)
+if not config.check_tile_management_repo():
+    sys.exit(config.ERRORS["REPO_ERROR"])
 
 # Import code from the tile-management repo
-sys.path.append(tile_management_scripts_dir)
+sys.path.append(config.UTILS_DIR)
 from ansible_utils import get_target_hosts, run_playbook
 
 # Output some general information before we start
-print("Experiment project directory: ", project_dir) # should point to tile-management repo clone
+print("Experiment project directory: ", config.PROJECT_DIR) # should point to tile-management repo clone
 
 # Read experiment settings
 with open(settings_path, "r") as f:
-    cfg = yaml.safe_load(f)
+    experiment_settings = yaml.safe_load(f)
 
-tiles = cfg.get("tiles", "")
+tiles = experiment_settings.get("tiles", "")
+if len(tiles) == 0:
+    print("The experiment doesn't target any tiles.")
+    sys.exit(ERRORS["NO_TILES_ERROR"])
+test_connectivity = experiment_settings.get("test_connectivity", True)
+halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_failure", True)
+extra_packages = experiment_settings.get("extra_packages", "")
+experiment_repo = experiment_settings.get("experiment_repo", "")
+organisation = experiment_settings.get("organisation", "")
+client_script = experiment_settings.get("script", "")
+script_full_path = os.path.join("/home/pi", experiment_repo, "experiment-settings.yaml")
+script_working_dir = os.path.join("/home/pi", experiment_repo, "data")
 
 # host list can be used to identify individual tiles from group names
 # We don't need it to run ansible playbooks, but it is a first check to see if the tiles are specified correctly
-host_list = get_target_hosts(inventory_path, limit=tiles, suppress_warnings=True)
+host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
+
+# reassign tiles, wrongly specified tiles have been removed from list
+tiles = " ".join(host_list)
 print("Working on", len(host_list) ,"tile(s):", tiles)
 
-print("Testing connectivity ... ")
-playbook_path = os.path.join(tile_management_playbook_dir, "ping.yaml")
+# First we test connectivity
+nr_active_tiles = 0
+if test_connectivity:
+    print("Testing connectivity ... ")
+    playbook_path = os.path.join(config.PLAYBOOK_DIR, "ping.yaml")
+
+    (tiles, nr_active_tiles) = run_playbook(
+        config.PROJECT_DIR,
+        playbook_path,
+        config.INVENTORY_PATH,
+        extra_vars=None,
+        hosts=tiles,
+        mute_output=not(args.ansible_output),
+        suppress_warnings=True,
+        cleanup=True
+    )
+
+    if not (nr_active_tiles == len(host_list)):
+        print("Unable to connect to all tiles.")
+        if halt_on_connectivity_failure:
+            print("Aborting (halt_on_connectivity_failure = True)")
+            # Print active tiles
+            active_list = tiles.split(' ')
+            print("Active tiles:", tiles)
+            # Print inactive tiles
+            inactive_list = ""
+            for t in host_list:
+                if str(t) not in active_list:
+                    if len(inactive_list) > 0:
+                        inactive_list += " "
+                    inactive_list += str(t)
+            print("Inactive tiles:", inactive_list)
+            sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+    
+    print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
+            
+prev_nr_active_tiles = nr_active_tiles
+
+print("Pulling the experiment repo:", experiment_repo ,"... ")
 
 (tiles, nr_active_tiles) = run_playbook(
-  project_dir,
-  playbook_path,
-  inventory_path,
-  extra_vars=None,
-  hosts=tiles,
-  mute_output=True,
-  suppress_warnings=True,
-  cleanup=True)
+    config.PROJECT_DIR,
+    playbook_path,
+    config.INVENTORY_PATH,
+    extra_vars={
+        'org_name': organisation,
+        'repo_name': experiment_repo
+    },
+    hosts=tiles,
+    mute_output= not(args.ansible_output),
+    suppress_warnings=True,
+    cleanup=True
+)
 
-if not (nr_active_tiles == len(host_list)):
-  print("Unable to connect to all tiles.")
-  print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
+if not (nr_active_tiles == prev_nr_active_tiles):
+    print("Unable to connect to all tiles.")
+    if halt_on_connectivity_failure:
+        print("Aborting (halt_on_connectivity_failure = True)")
+        # Print active tiles
+        active_list = tiles.split(' ')
+        print("Active tiles:", tiles)
+        # Print inactive tiles
+        inactive_list = ""
+        for t in host_list:
+            if str(t) not in active_list:
+                if len(inactive_list) > 0:
+                    inactive_list += " "
+                inactive_list += str(t)
+        print("Inactive tiles:", inactive_list)
+        sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+
+print("Pulled repository on tiles(s):", tiles)
+prev_nr_active_tiles = nr_active_tiles
+    
+print("Installing client script:", client_script, "... ")
+playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
+
+(tiles, nr_active_tiles) = run_playbook(
+    config.PROJECT_DIR,
+    playbook_path,
+    config.INVENTORY_PATH,
+    extra_vars={
+        'script_path': os.path.join(config.TILE_MANAGEMENT_REPO_DIR, 'tiles/install-experiment.sh'),
+        'sudo': 'yes',
+        'script_args': ' '.join(['install', script_full_path, script_working_dir])
+    },
+    hosts=tiles,
+    mute_output=not(args.ansible_output),
+    suppress_warnings=True,
+    cleanup=True
+)
+
+if not (nr_active_tiles == prev_nr_active_tiles):
+    print("Unable to connect to all tiles.")
+    if halt_on_connectivity_failure:
+        print("Aborting (halt_on_connectivity_failure = True)")
+        # Print active tiles
+        active_list = tiles.split(' ')
+        print("Active tiles:", tiles)
+        # Print inactive tiles
+        inactive_list = ""
+        for t in host_list:
+            if str(t) not in active_list:
+                if len(inactive_list) > 0:
+                    inactive_list += " "
+                inactive_list += str(t)
+        print("Inactive tiles:", inactive_list)
+        sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+
+print("Updated experiment client script on tiles(s):", tiles)
+
+print("Done.")

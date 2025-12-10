@@ -92,10 +92,10 @@ tiles = experiment_settings.get("tiles", "")
 if len(tiles) == 0:
     print("The experiment doesn't target any tiles.")
     sys.exit(ERRORS["NO_TILES_ERROR"])
-test_connectivity = experiment_settings.get("test-connectivity", True)
-halt_on_connectivity_failure = experiment_settings.get("halt-on-connectivity-failure", True)
-extra_packages = experiment_settings.get("extra-packages", "")
-experiment_repo = experiment_settings.get("experiment-repo", "")
+test_connectivity = experiment_settings.get("test_connectivity", True)
+halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_failure", True)
+extra_packages = experiment_settings.get("extra_packages", "")
+experiment_repo = experiment_settings.get("experiment_repo", "")
 organisation = experiment_settings.get("organisation", "")
 
 # host list can be used to identify individual tiles from group names
@@ -126,7 +126,7 @@ if test_connectivity:
     if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
         if halt_on_connectivity_failure:
-            print("Aborting (halt-on-connectivity-failure = True)")
+            print("Aborting (halt_on_connectivity_failure = True)")
             # Print active tiles
             active_list = tiles.split(' ')
             print("Active tiles:", tiles)
@@ -162,7 +162,7 @@ if not (args.skip_apt or args.repos_only or args.check_uhd_only):
     if not (nr_active_tiles == prev_nr_active_tiles):
         print("Unable to connect to all tiles.")
         if halt_on_connectivity_failure:
-            print("Aborting (halt-on-connectivity-failure = True)")
+            print("Aborting (halt_on_connectivity_failure = True)")
             # Print active tiles
             active_list = tiles.split(' ')
             print("Active tiles:", tiles)
@@ -198,7 +198,7 @@ if not (args.skip_apt or args.repos_only or args.check_uhd_only):
     if not (nr_active_tiles == prev_nr_active_tiles):
         print("Unable to connect to all tiles.")
         if halt_on_connectivity_failure:
-            print("Aborting (halt-on-connectivity-failure = True)")
+            print("Aborting (halt_on_connectivity_failure = True)")
             # Print active tiles
             active_list = tiles.split(' ')
             print("Active tiles:", tiles)
@@ -236,7 +236,7 @@ if (not args.install_only) and (not args.check_uhd_only):
     if not (nr_active_tiles == prev_nr_active_tiles):
         print("Unable to connect to all tiles.")
         if halt_on_connectivity_failure:
-            print("Aborting (halt-on-connectivity-failure = True)")
+            print("Aborting (halt_on_connectivity_failure = True)")
             # Print active tiles
             active_list = tiles.split(' ')
             print("Active tiles:", tiles)
@@ -269,7 +269,7 @@ if (not args.install_only) and (not args.check_uhd_only):
     if not (nr_active_tiles == prev_nr_active_tiles):
         print("Unable to connect to all tiles.")
         if halt_on_connectivity_failure:
-            print("Aborting (halt-on-connectivity-failure = True)")
+            print("Aborting (halt_on_connectivity_failure = True)")
             # Print active tiles
             active_list = tiles.split(' ')
             print("Active tiles:", tiles)
@@ -308,7 +308,7 @@ if (not args.install_only) and (not args.repos_only):
     if not (nr_active_tiles == prev_nr_active_tiles):
         print("Unable to connect to all tiles.")
         if halt_on_connectivity_failure:
-            print("Aborting (halt-on-connectivity-failure = True)")
+            print("Aborting (halt_on_connectivity_failure = True)")
             # Print active tiles
             active_list = tiles.split(' ')
             print("Active tiles:", tiles)

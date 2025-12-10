@@ -38,8 +38,8 @@ tiles = experiment_settings.get("tiles", "")
 if len(tiles) == 0:
     print("The experiment doesn't target any tiles.")
     sys.exit(config.ERRORS["NO_TILES_ERROR"])
-test_connectivity = experiment_settings.get("test-connectivity", True)
-halt_on_connectivity_failure = experiment_settings.get("halt-on-connectivity-failure", True)
+test_connectivity = experiment_settings.get("test_connectivity", True)
+halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_failure", True)
 
 # host list can be used to identify individual tiles from group names
 # We don't need it to run ansible playbooks, but it is a first check to see if the tiles are specified correctly
@@ -66,7 +66,7 @@ if test_connectivity:
     if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
         if halt_on_connectivity_failure:
-            print("Aborting (halt-on-connectivity-failure = True)")
+            print("Aborting (halt_on_connectivity_failure = True)")
             # Print active tiles
             active_list = tiles.split(' ')
             print("Active tiles:", tiles)
@@ -101,7 +101,7 @@ playbook_path = os.path.join(config.PLAYBOOK_DIR, "clean-home.yaml")
 if not (nr_active_tiles == prev_nr_active_tiles):
     print("Unable to connect to all tiles.")
     if halt_on_connectivity_failure:
-        print("Aborting (halt-on-connectivity-failure = True)")
+        print("Aborting (halt_on_connectivity_failure = True)")
         # Print active tiles
         active_list = tiles.split(' ')
         print("Active tiles:", tiles)
@@ -140,7 +140,7 @@ playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
 if not (nr_active_tiles == prev_nr_active_tiles):
     print("Unable to connect to all tiles.")
     if halt_on_connectivity_failure:
-        print("Aborting (halt-on-connectivity-failure = True)")
+        print("Aborting (halt_on_connectivity_failure = True)")
         # Print active tiles
         active_list = tiles.split(' ')
         print("Active tiles:", tiles)

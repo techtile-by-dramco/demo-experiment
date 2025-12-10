@@ -1,18 +1,24 @@
 # Experiment settings
 
 # Experiment repository
-experiment-repo: "demo-experiment"  # github repo name
+experiment_repo: "demo-experiment"  # github repo name
 organisation: "techtile-by-dramco"  # github org
 
 # Tile settings
-#tiles: "segmentA"                   # group name, single tile, or space-separated list
-tiles: "A05 A06 A07 A08 A09 A10"    # group name, single tile, or space-separated list
+tiles: "B06"
+#tiles: "B05 B06 B07 B08 B09 B10"                   # group name, single tile, or space-separated list
+#tiles: "A05 A06 A07 A08 A09 A10"    # group name, single tile, or space-separated list
 
-extra-packages:                     # list of extra packages to be installed on the tiles' rpi's
+extra_packages:                     # list of extra packages to be installed on the tiles' rpi's
   - python3-numpy
   - python3-scipy
   - python3-zmq
 
+client_script_name: "uhd-receive.py"
+script_args:
+#  - "--message"
+#  - "Hello"
+
 # Server script behaviour
-test-connectivity: True             # set True if you want to test tile connectivity before continuing.
-halt-on-connectivity-failure: True  # set False if you want to continue with only the active tiles
+test_connectivity: True             # set True if you want to test tile connectivity before continuing.
+halt_on_connectivity_failure: True  # set False if you want to continue with only the active tiles

@@ -4,7 +4,7 @@
 
 set -e
 
-INSTALL_PACKAGES=0                      # can be put to 0 to speed up activation, once all necessary packages are installed
+INSTALL_PACKAGES=1                      # can be put to 0 to speed up activation, once all necessary packages are installed
 CLONE_TILE_MANAGEMENT_REPO=1            # 0 while developing the tile-management repo, 1 otherwise
 TILE_MANAGEMENT_REPO_PARENT="$HOME"     # don't change, other locations not supported
 
