@@ -12,6 +12,10 @@ else:
     print("UHD_IMAGES_DIR not set")
     sys.exit(-1)
 
+# how to use a custom fpga image
+script_dir = os.path.dirname(os.path.realpath(__file__))
+fpga_path = os.path.join(script_dir, "usrp_b210_fpga_loopback.bin")
+
 ########################################
 # User parameters
 ########################################
@@ -24,7 +28,7 @@ CHANNEL = 0              # RX channel 0 = first channel on B210
 ########################################
 # Create USRP
 ########################################
-usrp = uhd.usrp.MultiUSRP()
+usrp = uhd.usrp.MultiUSRP(f"fpga={fpga_path}")
 
 # Set rate, frequency, gain
 usrp.set_rx_rate(SAMPLE_RATE, CHANNEL)
