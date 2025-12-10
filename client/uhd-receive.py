@@ -2,6 +2,15 @@
 import uhd
 import numpy as np
 import time
+import os
+import sys
+
+# check if UHD_IMAGES_DIR is set, no use in continuing otherwise because failure is guaranteed
+if os.environ.get("UHD_IMAGES_DIR"):
+    print(os.environ.get("UHD_IMAGES_DIR"))
+else:
+    print("UHD_IMAGES_DIR not set")
+    sys.exit(-1)
 
 ########################################
 # User parameters

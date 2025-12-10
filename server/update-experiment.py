@@ -101,6 +101,7 @@ if test_connectivity:
 prev_nr_active_tiles = nr_active_tiles
 
 print("Pulling the experiment repo:", experiment_repo ,"... ")
+playbook_path = os.path.join(config.PLAYBOOK_DIR, "pull-repo.yaml")
 
 (tiles, nr_active_tiles) = run_playbook(
     config.PROJECT_DIR,
