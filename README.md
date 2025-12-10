@@ -52,15 +52,19 @@ organisation: "yourname"
 The ```setup-clients.py``` script performs several actions:
 * An apt update && apt upgrade to ensure all packages are up-to-date
 * In install of several extra packages. The following are installed by default:
-    ** git
-    ** python3-venv
-    ** build-essential
-    ** libuhd-dev
-    ** python3-uhd
-    ** uhd-host
-    ** cmake
-    ** libboost-all-dev
-* Other packages required by your client script can be specified in ```experiment-settings.yaml```.
+    * git
+    * python3-venv
+    * build-essential
+    * libuhd-dev
+    * python3-uhd
+    * uhd-host
+    * cmake
+    * libboost-all-dev
+  Other packages required by your client script can be specified in ```experiment-settings.yaml```.
+* Download the repositories needed to run the experiment on the client, i.e., the [tile-management](https://github.com/techtile-by-dramco/tile-management) repo and your own experiment repo.
+* Check if UHD is installed and if the UHD Python API is available. This operation will also download the necessary USRP firmware images.
+
+Each of this steps can be run separately as well.
 
 #### Usage
 ```
