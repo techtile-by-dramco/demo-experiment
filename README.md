@@ -42,14 +42,28 @@ This script reads several settings from ```experiment-settings.yaml```. Make sur
 #### Most important settings
 * ```tiles```: list of clients (or predefined groups such as "ceiling", "segmentA", etc.). This list is to be presented as a string where each name is separated by a space.
 * ```extra_packages```:  list of extra packages to be installed on the client (needed to run the experiment client script).
-* ```experiment_repo``` and ```organisation```: names of your GitHub repository and organisation. If you have forked your own experiment repo under "https://github.com/yourname/my-techtile-experiment", then:
+* ```experiment_repo``` and ```organisation```: names of your GitHub repository and organisation. If you have forked your own experiment repo under "https://github.com/yourname/my-techtile-experiment", then put:
 ```yaml
 experiment_repo: "my-techtile-experiment"
 organisation: "yourname"
 ```
 
+#### Script actions
+The ```setup-clients.py``` script performs several actions:
+* An apt update && apt upgrade to ensure all packages are up-to-date
+* In install of several extra packages. The following are installed by default:
+    ** git
+    ** python3-venv
+    ** build-essential
+    ** libuhd-dev
+    ** python3-uhd
+    ** uhd-host
+    ** cmake
+    ** libboost-all-dev
+* Other packages required by your client script can be specified in ```experiment-settings.yaml```.
+
 #### Usage
-```bash
+```
 python setup-clients.py -h
 usage: setup-clients.py [-h] [--ansible-output] [--skip-apt] [--install-only] [--repos-only] [--check-uhd-only]
 
@@ -71,7 +85,7 @@ options:
   --check-uhd-only, -c  Only check if the UHD python API is available
 ```
 
-```bash
+```
 python update-experiment.py -h
 usage: update-experiment.py [-h] [--ansible-output]
 
