@@ -97,7 +97,9 @@ if test_connectivity:
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
     
     print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
-            
+else:
+    nr_active_tiles = len(host_list)
+    
 prev_nr_active_tiles = nr_active_tiles
 
 print("Pulling the experiment repo:", experiment_repo ,"... ")

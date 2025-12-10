@@ -98,7 +98,9 @@ if test_connectivity:
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
         else:
             print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
-            
+else:
+    nr_active_tiles = len(host_list)
+    
 prev_nr_active_tiles = nr_active_tiles
 
 playbook_path = os.path.join(config.PLAYBOOK_DIR, "manage-service.yaml")
