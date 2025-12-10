@@ -6,7 +6,7 @@ organisation: "techtile-by-dramco"  # github org
 
 # Tile settings
 #tiles: "B05"
-tiles: "B05 B06 B07 B08 B09 B10"                   # group name, single tile, or space-separated list
+tiles: "D09 D10"                   # group name, single tile, or space-separated list
 #tiles: "A05 A06 A07 A08 A09 A10"    # group name, single tile, or space-separated list
 
 extra_packages:                     # list of extra packages to be installed on the tiles' rpi's
@@ -20,5 +20,5 @@ script_args:
 #  - "Hello"
 
 # Server script behaviour
-test_connectivity: False             # set True if you want to test tile connectivity before continuing.
-halt_on_connectivity_failure: True  # set False if you want to continue with only the active tiles
+test_connectivity: True             # set True if you want to test tile connectivity before continuing.
+halt_on_connectivity_failure: False  # set False if you want to continue with only the active tiles
