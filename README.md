@@ -51,7 +51,7 @@ organisation: "yourname"
 #### Script actions
 The ```setup-clients.py``` script performs several actions:
 * An apt update && apt upgrade to ensure all packages are up-to-date
-* In install of several extra packages. The following are installed by default:
+* Installation of several extra packages. Other packages required by your client script can be specified in ```experiment-settings.yaml```, but the following packages are installed by default:
     * git
     * python3-venv
     * build-essential
@@ -60,11 +60,19 @@ The ```setup-clients.py``` script performs several actions:
     * uhd-host
     * cmake
     * libboost-all-dev
-  Other packages required by your client script can be specified in ```experiment-settings.yaml```.
 * Download the repositories needed to run the experiment on the client, i.e., the [tile-management](https://github.com/techtile-by-dramco/tile-management) repo and your own experiment repo.
 * Check if UHD is installed and if the UHD Python API is available. This operation will also download the necessary USRP firmware images.
 
-Each of this steps can be run separately as well.
+Each of these steps can be run separately as well.
+
+**Important remark** Sometimes it is required to reboot the clients after the installation of UHD. This can be done using:
+```
+python reboot-clients.py
+```
+It is recommended to follow-up with:
+```
+python setup-clients.py --check-uhd-only
+```
 
 #### Usage
 ```
@@ -89,6 +97,7 @@ options:
   --check-uhd-only, -c  Only check if the UHD python API is available
 ```
 
+### 3. Running the experiment
 ```
 python update-experiment.py -h
 usage: update-experiment.py [-h] [--ansible-output]
@@ -103,3 +112,5 @@ options:
   -h, --help            show this help message and exit
   --ansible-output, -a  Enable ansible output
 ```
+
+### 4. Experiment clean-up
