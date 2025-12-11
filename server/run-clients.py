@@ -128,7 +128,7 @@ if args.stop:
         playbook_path,
         config.INVENTORY_PATH,
         extra_vars={
-            'service_state': 'started',
+            'service_state': 'stopped',
         },
         hosts=tiles,
         mute_output=not(args.ansible_output),
