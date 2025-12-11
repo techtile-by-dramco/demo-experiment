@@ -112,7 +112,7 @@ if test_connectivity:
     print("Testing connectivity ... ")
     playbook_path = os.path.join(config.PLAYBOOK_DIR, "ping.yaml")
 
-    (tiles, nr_active_tiles) = run_playbook(
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
         config.PROJECT_DIR,
         playbook_path,
         config.INVENTORY_PATH,
@@ -125,23 +125,14 @@ if test_connectivity:
 
     if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
         if halt_on_connectivity_failure:
             print("Aborting (halt_on_connectivity_failure = True)")
-            # Print active tiles
-            active_list = tiles.split(' ')
-            print("Active tiles:", tiles)
-            # Print inactive tiles
-            inactive_list = ""
-            for t in host_list:
-                if str(t) not in active_list:
-                    if len(inactive_list) > 0:
-                        inactive_list += " "
-                    inactive_list += str(t)
-            print("Inactive tiles:", inactive_list)
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
-    
-    print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
 else:
+    # we did not test connectivity so we assume all tiles are active
     nr_active_tiles = len(host_list)
              
 prev_nr_active_tiles = nr_active_tiles
@@ -150,7 +141,7 @@ if not (args.skip_apt or args.repos_only or args.check_uhd_only):
     print("Running apt update/upgrade ... ")
     playbook_path = os.path.join(config.PLAYBOOK_DIR, "update-upgrade.yaml")
 
-    (tiles, nr_active_tiles) = run_playbook(
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
         config.PROJECT_DIR,
         playbook_path,
         config.INVENTORY_PATH,
@@ -161,22 +152,14 @@ if not (args.skip_apt or args.repos_only or args.check_uhd_only):
         cleanup=True
     )
 
-    if not (nr_active_tiles == prev_nr_active_tiles):
+    if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
         if halt_on_connectivity_failure:
             print("Aborting (halt_on_connectivity_failure = True)")
-            # Print active tiles
-            active_list = tiles.split(' ')
-            print("Active tiles:", tiles)
-            # Print inactive tiles
-            inactive_list = ""
-            for t in host_list:
-                if str(t) not in active_list:
-                    if len(inactive_list) > 0:
-                        inactive_list += " "
-                    inactive_list += str(t)
-            print("Inactive tiles:", inactive_list)
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
 
     print("Updated packages on tiles(s):", tiles)
     prev_nr_active_tiles = nr_active_tiles
@@ -184,7 +167,7 @@ if not (args.skip_apt or args.repos_only or args.check_uhd_only):
     print("Installing extra packages ... ")
     playbook_path = os.path.join(config.PLAYBOOK_DIR, "install-packages.yaml")
 
-    (tiles, nr_active_tiles) = run_playbook(
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
         config.PROJECT_DIR,
         playbook_path,
         config.INVENTORY_PATH,
@@ -197,22 +180,14 @@ if not (args.skip_apt or args.repos_only or args.check_uhd_only):
         cleanup=True
     )
     
-    if not (nr_active_tiles == prev_nr_active_tiles):
+    if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
         if halt_on_connectivity_failure:
             print("Aborting (halt_on_connectivity_failure = True)")
-            # Print active tiles
-            active_list = tiles.split(' ')
-            print("Active tiles:", tiles)
-            # Print inactive tiles
-            inactive_list = ""
-            for t in host_list:
-                if str(t) not in active_list:
-                    if len(inactive_list) > 0:
-                        inactive_list += " "
-                    inactive_list += str(t)
-            print("Inactive tiles:", inactive_list)
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
     
     print("Updated packages on tiles(s):", tiles)
     prev_nr_active_tiles = nr_active_tiles
@@ -221,7 +196,7 @@ if (not args.install_only) and (not args.check_uhd_only):
     print("Pulling the tile-management repo ... ")
     playbook_path = os.path.join(config.PLAYBOOK_DIR, "pull-repo.yaml")
     
-    (tiles, nr_active_tiles) = run_playbook(
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
         config.PROJECT_DIR,
         playbook_path,
         config.INVENTORY_PATH,
@@ -235,26 +210,18 @@ if (not args.install_only) and (not args.check_uhd_only):
         cleanup=True
     )
     
-    if not (nr_active_tiles == prev_nr_active_tiles):
+    if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
         if halt_on_connectivity_failure:
             print("Aborting (halt_on_connectivity_failure = True)")
-            # Print active tiles
-            active_list = tiles.split(' ')
-            print("Active tiles:", tiles)
-            # Print inactive tiles
-            inactive_list = ""
-            for t in host_list:
-                if str(t) not in active_list:
-                    if len(inactive_list) > 0:
-                        inactive_list += " "
-                    inactive_list += str(t)
-            print("Inactive tiles:", inactive_list)
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
        
     print("Pulling the experiment repo:", experiment_repo ,"... ")
     
-    (tiles, nr_active_tiles) = run_playbook(
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
         config.PROJECT_DIR,
         playbook_path,
         config.INVENTORY_PATH,
@@ -268,22 +235,14 @@ if (not args.install_only) and (not args.check_uhd_only):
         cleanup=True
     )
     
-    if not (nr_active_tiles == prev_nr_active_tiles):
+    if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
         if halt_on_connectivity_failure:
             print("Aborting (halt_on_connectivity_failure = True)")
-            # Print active tiles
-            active_list = tiles.split(' ')
-            print("Active tiles:", tiles)
-            # Print inactive tiles
-            inactive_list = ""
-            for t in host_list:
-                if str(t) not in active_list:
-                    if len(inactive_list) > 0:
-                        inactive_list += " "
-                    inactive_list += str(t)
-            print("Inactive tiles:", inactive_list)
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
     
     print("Pulled all repositories on tiles(s):", tiles)
     prev_nr_active_tiles = nr_active_tiles
@@ -292,7 +251,7 @@ if (not args.install_only) and (not args.repos_only):
     print("Checking uhd ... ")
     playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
     
-    (tiles, nr_active_tiles) = run_playbook(
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
         config.PROJECT_DIR,
         playbook_path,
         config.INVENTORY_PATH,
@@ -307,22 +266,14 @@ if (not args.install_only) and (not args.repos_only):
         cleanup=True
     )
     
-    if not (nr_active_tiles == prev_nr_active_tiles):
+    if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
         if halt_on_connectivity_failure:
             print("Aborting (halt_on_connectivity_failure = True)")
-            # Print active tiles
-            active_list = tiles.split(' ')
-            print("Active tiles:", tiles)
-            # Print inactive tiles
-            inactive_list = ""
-            for t in host_list:
-                if str(t) not in active_list:
-                    if len(inactive_list) > 0:
-                        inactive_list += " "
-                    inactive_list += str(t)
-            print("Inactive tiles:", inactive_list)
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
 
     print("UHD python API available on tiles(s):", tiles)
     

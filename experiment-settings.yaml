@@ -6,7 +6,7 @@ organisation: "techtile-by-dramco"  # github org
 
 # Tile settings
 #tiles: "segmentB segmentF"
-tiles: "D09 D10"                   # group name, single tile, or space-separated list
+tiles: "ceiling"                   # group name, single tile, or space-separated list
 #tiles: "A05 A06 A07 A08 A09 A10"    # group name, single tile, or space-separated list
 
 extra_packages:                     # list of extra packages to be installed on the tiles' rpi's
