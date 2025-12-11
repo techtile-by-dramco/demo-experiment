@@ -12,11 +12,11 @@ Your Linux workstation will henceforth be called "server". Each physical tile of
 Once you have created your own repository it is good to take note of the directory structure.
 
 #### Repo structure
-**client:** This folder is for code that needs to run on the client. This is also a good place to store, for example, custom FPGA images for the USRP.
-**data:** This folder is for raw experiment data.
-**results:** This folder for processed data.
-**server:** This folder is for code that runs on the server.
-**experiment-settings.yaml:** Experiment configuration file.
+* **client:** This folder is for code that needs to run on the client. This is also a good place to store, for example, custom FPGA images for the USRP.
+* **data:** This folder is for raw experiment data.
+* **results:** This folder for processed data.
+* **server:** This folder is for code that runs on the server.
+* **experiment-settings.yaml:** Experiment configuration file.
 
 #### Semi-automated server setup
 You can use the ```server/setup-server.sh``` script to help you setup your server so it is able to run all the necessary scripts.
@@ -75,7 +75,7 @@ It is recommended to follow-up with:
 python setup-clients.py --check-uhd-only
 ```
 
-#### Usage
+#### Usage options
 ```
 python setup-clients.py -h
 usage: setup-clients.py [-h] [--ansible-output] [--skip-apt] [--install-only] [--repos-only] [--check-uhd-only]
@@ -99,6 +99,29 @@ options:
 ```
 
 ### 3. Running the experiment
+Running an experiment might be an iterative process.
+1. Make changes to ```experiment-settings.yaml```, your client script (or both)
+2. Run the experiment
+3. Collect your data
+4. Repeat
+
+#### 1. Updating your experiment
+If you have changed your client script's arguments, created a new client script (or renamed it), it is important to update ```experiment-settings.yaml```. For example:
+
+```yaml
+client_script_name: "my-usrp-measurement.py"
+script_args:
+  - "--frequency-MHz"
+  - "2400"
+  - "--duration-s"
+  - "600"
+```
+
+Once you've made changes (step 1), it is important to push these changes to the clients. This is also a two-step process:
+1. Push the modifications to your git repository
+2. Run ```python update-experiment.py```
+
+#### Usage options
 ```
 python update-experiment.py -h
 usage: update-experiment.py [-h] [--ansible-output]
@@ -112,6 +135,21 @@ This involves:
 options:
   -h, --help            show this help message and exit
   --ansible-output, -a  Enable ansible output
+```
+#### 2. Running your experiment
+
+#### Usage options
+```
+python run-clients.py -h
+usage: run-clients.py [-h] [--ansible-output] [--start] [--stop]
+
+Run (or halt) an experiment client script the raspberry pi's on the tiles.
+
+options:
+  -h, --help            show this help message and exit
+  --ansible-output, -a  Enable ansible output
+  --start               Start the script
+  --stop                Stop the script
 ```
 
 ### 4. Experiment clean-up
