@@ -27,7 +27,6 @@ client_script_args:
   - "1e6"
   - "--channels"
   - "0"
-  - "1"
   - "--wave-ampl"
   - "0.8"
   - "--gain"
