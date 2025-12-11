@@ -118,7 +118,7 @@ script_args:
 ```
 
 Once you've made changes (step 1), it is important to push these changes to the clients. This is also a two-step process:
-1. Push the modifications to your git repository
+1. Push the modifications to your git repository using your preferred method
 2. Run ```python update-experiment.py```
 
 #### Usage options
@@ -136,7 +136,9 @@ options:
   -h, --help            show this help message and exit
   --ansible-output, -a  Enable ansible output
 ```
+
 #### 2. Running your experiment
+Now you can start your experiment. The ```run-clients.py``` allows you to start your all your client scripts (or stop a running script).
 
 #### Usage options
 ```
@@ -152,7 +154,13 @@ options:
   --stop                Stop the script
 ```
 
+#### 3. Collect your data
+**TODO:** No scripts for collecting your data yet.
+
 ### 4. Experiment clean-up
+Once your completely finished with an experiment. It is always good to clean-up the clients so the person using them after you doesn't run into any conflicts. In order to do so, use the ```cleanup-clients.py``` script.
+
+#### Usage options
 ```
 python cleanup-clients.py -h
 usage: cleanup-clients.py [-h] [--ansible-output]
