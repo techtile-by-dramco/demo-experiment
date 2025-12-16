@@ -201,6 +201,34 @@ Behavior:
 
 ---
 
+
+## CAL
+
+
+```
+CAL:
+  - mode: LB
+```
+
+Behavior:
+
+---
+
+
+## PILOT
+
+Aligns all tiles to a common time reference.
+
+```
+PILOT:
+  - tx_tiles: 
+  - rx_tiles: <ALL>
+```
+
+Behavior:
+
+---
+
 ## SETUP
 
 Loads static experiment configuration. Does not start RF activity.
