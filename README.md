@@ -258,6 +258,8 @@ START:
   - direction: tx | rx
   - duration: <time-ms>
   - tiles: ALL (default)
+  - waveform: <file_name> (optional)
+  - weights: <file_name> (optional)
 ```
 
 Semantics:
