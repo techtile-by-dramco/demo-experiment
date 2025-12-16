@@ -225,6 +225,7 @@ PILOT:
   - at: <time-ms> | delay: <time-ms>
   - tx_tiles: 
   - rx_tiles: <ALL>
+  - waveform: <file name>
 ```
 
 Behavior:
