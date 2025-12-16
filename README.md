@@ -171,3 +171,28 @@ options:
   -h, --help            show this help message and exit
   --ansible-output, -a  Enable ansible output
 ```
+
+
+
+
+### Server-USRP communication standard
+All commands are non-blocking and broadcasted. If unicasted desired, specify the host/tile in the command args.
+
+SYNC:
+   - ON_NEXT_PPS
+SETUP:
+   - waveform: <file_name>
+   - weights: <file_name>
+START:
+   - on: <time-ms> | delay: <time-ms>
+   - type: CONTINUOUS | START_AND_STOP
+   - direction: tx | rx
+   - duration: <time-ms>
+   - tiles: ALL (default)
+
+STOP:
+   - on: <time-ms> | delay: <time-ms>
+   - direction: tx | rx
+   - tiles: ALL (default)
+
+
