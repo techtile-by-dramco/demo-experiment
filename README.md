@@ -182,7 +182,7 @@ options:
 - Commands are broadcast by default.
 - Unicast behavior is enabled by explicitly specifying `tiles` or `hosts`.
 - All time references use USRP time and assume PPS alignment.
-- Commands are expected to be answered when executed.
+- Commands are expected to be answered when executed via a "<command>_DONE" message, e.g., "SYNC_DONE"
 
 ---
 
