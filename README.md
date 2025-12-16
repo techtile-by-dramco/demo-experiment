@@ -207,6 +207,7 @@ Behavior:
 
 ```
 CAL:
+  - at: <time-ms> | delay: <time-ms>
   - mode: LB
 ```
 
@@ -221,6 +222,7 @@ Aligns all tiles to a common time reference.
 
 ```
 PILOT:
+  - at: <time-ms> | delay: <time-ms>
   - tx_tiles: 
   - rx_tiles: <ALL>
 ```
