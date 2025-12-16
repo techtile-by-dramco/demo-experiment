@@ -190,8 +190,10 @@ options:
 
 Aligns all tiles to a common time reference.
 
+```
 SYNC:
   - mode: ON_NEXT_PPS | IMMEDIATE
+```
 
 Behavior:
 - ON_NEXT_PPS aligns internal time at the next PPS edge.
@@ -202,12 +204,13 @@ Behavior:
 ## SETUP
 
 Loads static experiment configuration. Does not start RF activity.
-
+```
 SETUP:
   - waveform: <file_name>
   - weights: <file_name>
   - direction: tx | rx
   - tiles: ALL (default)
+```
 
 Notes:
 - May be called multiple times before START.
@@ -220,12 +223,14 @@ Notes:
 
 Schedules RF activity.
 
+```
 START:
   - at: <time-ms> | delay: <time-ms>
   - mode: CONTINUOUS | BURST
   - direction: tx | rx
   - duration: <time-ms>
   - tiles: ALL (default)
+```
 
 Semantics:
 - at is absolute USRP time.
@@ -242,12 +247,12 @@ Constraints:
 ## STOP
 
 Stops RF activity.
-
+```
 STOP:
   - at: <time-ms> | delay: <time-ms>
   - direction: tx | rx | both
   - tiles: ALL (default)
-
+```
 Behavior:
 - Cancels running and scheduled START commands.
 - both stops TX and RX simultaneously.
@@ -258,9 +263,11 @@ Behavior:
 
 Queries the system state.
 
+```
 STATUS:
   - query: TIME | STATE | SETUP
   - tiles: ALL (default)
+```
 
 Returns:
 - TIME returns current USRP time.
@@ -273,8 +280,10 @@ Returns:
 
 Immediate safety stop.
 
+```
 ABORT:
   - tiles: ALL (default)
+```
 
 Behavior:
 - Immediate RF shutdown.
@@ -286,7 +295,7 @@ Behavior:
 ## Typical experiment flows
 
 Burst experiment:
-
+```
 SYNC:
   - mode: ON_NEXT_PPS
 
@@ -300,9 +309,10 @@ START:
   - mode: BURST
   - direction: tx
   - duration: 1000
+```
 
 Continuous experiment:
-
+```
 SYNC:
   - mode: ON_NEXT_PPS
 
@@ -319,5 +329,4 @@ START:
 STOP:
   - delay: 5000
   - direction: rx
-
-
+```
