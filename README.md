@@ -175,24 +175,149 @@ options:
 
 
 
-### Server-USRP communication standard
-All commands are non-blocking and broadcasted. If unicasted desired, specify the host/tile in the command args.
+# Server–USRP Communication Standard
+
+## General principles
+- All commands are non-blocking.
+- Commands are broadcast by default.
+- Unicast behavior is enabled by explicitly specifying `tiles` or `hosts`.
+- All time references use USRP time and assume PPS alignment.
+- Commands are idempotent where applicable.
+
+---
+
+## SYNC
+
+Aligns all tiles to a common time reference.
 
 SYNC:
-   - ON_NEXT_PPS
+  - mode: ON_NEXT_PPS | IMMEDIATE
+
+Behavior:
+- ON_NEXT_PPS aligns internal time at the next PPS edge.
+- IMMEDIATE aligns immediately using the current PPS state (debug only).
+
+---
+
+## SETUP
+
+Loads static experiment configuration. Does not start RF activity.
+
 SETUP:
-   - waveform: <file_name>
-   - weights: <file_name>
+  - waveform: <file_name>
+  - weights: <file_name>
+  - direction: tx | rx
+  - tiles: ALL (default)
+
+Notes:
+- May be called multiple times before START.
+- A new SETUP overwrites any previous setup for the addressed tiles.
+- No implicit START is triggered.
+
+---
+
+## START
+
+Schedules RF activity.
+
 START:
-   - on: <time-ms> | delay: <time-ms>
-   - type: CONTINUOUS | START_AND_STOP
-   - direction: tx | rx
-   - duration: <time-ms>
-   - tiles: ALL (default)
+  - at: <time-ms> | delay: <time-ms>
+  - mode: CONTINUOUS | BURST
+  - direction: tx | rx
+  - duration: <time-ms>
+  - tiles: ALL (default)
+
+Semantics:
+- at is absolute USRP time.
+- delay is relative to command reception time.
+- CONTINUOUS runs until explicitly stopped.
+- BURST stops automatically after duration.
+
+Constraints:
+- START without a prior SETUP is invalid.
+- A new START replaces any pending START for the same tile and direction.
+
+---
+
+## STOP
+
+Stops RF activity.
 
 STOP:
-   - on: <time-ms> | delay: <time-ms>
-   - direction: tx | rx
-   - tiles: ALL (default)
+  - at: <time-ms> | delay: <time-ms>
+  - direction: tx | rx | both
+  - tiles: ALL (default)
+
+Behavior:
+- Cancels running and scheduled START commands.
+- both stops TX and RX simultaneously.
+
+---
+
+## STATUS (optional)
+
+Queries the system state.
+
+STATUS:
+  - query: TIME | STATE | SETUP
+  - tiles: ALL (default)
+
+Returns:
+- TIME returns current USRP time.
+- STATE returns IDLE | ARMED | RUNNING.
+- SETUP returns active waveform and weights.
+
+---
+
+## ABORT
+
+Immediate safety stop.
+
+ABORT:
+  - tiles: ALL (default)
+
+Behavior:
+- Immediate RF shutdown.
+- Clears all pending schedules.
+- Preserves the last SETUP configuration.
+
+---
+
+## Typical experiment flows
+
+Burst experiment:
+
+SYNC:
+  - mode: ON_NEXT_PPS
+
+SETUP:
+  - waveform: wf.iq
+  - weights: bf.yml
+  - direction: tx
+
+START:
+  - at: 100000
+  - mode: BURST
+  - direction: tx
+  - duration: 1000
+
+Continuous experiment:
+
+SYNC:
+  - mode: ON_NEXT_PPS
+
+SETUP:
+  - waveform: wf.iq
+  - weights: bf.yml
+  - direction: rx
+
+START:
+  - delay: 0
+  - mode: CONTINUOUS
+  - direction: rx
+
+STOP:
+  - delay: 5000
+  - direction: rx
 
 
