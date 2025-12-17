@@ -5,20 +5,23 @@ To set up your own Techtile experiment, it is recommended to create your own rep
 
 Furthermore, in order to run most of the scripts, you will need to work on a the Techtile server or on your own Linux PC connected to the Techtile LAN.
 
-## General workflow
-### 1. Server setup
+---
+
+# General workflow
+
+## 1. Server setup
 Your Linux workstation will henceforth be called "server". Each physical tile of the Techtile setup houses a raspberry pi. These are referred to as "clients".
 
 Once you have created your own repository it is good to take note of the directory structure.
 
-#### Repo structure
+### Repo structure
 * **client:** This folder is for code that needs to run on the client. This is also a good place to store, for example, custom FPGA images for the USRP.
 * **data:** This folder is for raw experiment data.
 * **results:** This folder for processed data.
 * **server:** This folder is for code that runs on the server.
 * **experiment-settings.yaml:** Experiment configuration file.
 
-#### Semi-automated server setup
+### Semi-automated server setup
 You can use the ```server/setup-server.sh``` script to help you setup your server so it is able to run all the necessary scripts.
 
 ```bash
@@ -34,12 +37,12 @@ The ```setup-server.sh``` script will create a python virtual environment and do
 source bin/activate
 ```
 
-### 2. Client setup
+## 2. Client setup
 Getting the clients ready to run the experiment involves several steps, which are currently handled the ```setup-clients.py``` script.
 
 This script reads several settings from ```experiment-settings.yaml```. Make sure these are set correctly.
 
-#### Most important settings
+### Most important settings
 * ```tiles```: list of clients (or predefined groups such as "ceiling", "segmentA", etc.). This list is to be presented as a string where each name is separated by a space.
 * ```extra_packages```:  list of extra packages to be installed on the client (needed to run the experiment client script).
 * ```experiment_repo``` and ```organisation```: names of your GitHub repository and organisation. If you have forked your own experiment repo under "https://github.com/yourname/my-techtile-experiment", then put:
@@ -48,7 +51,7 @@ experiment_repo: "my-techtile-experiment"
 organisation: "yourname"
 ```
 
-#### Script actions
+### Script actions
 The ```setup-clients.py``` script performs several actions:
 * An apt update && apt upgrade to ensure all packages are up-to-date
 * Installation of several extra packages. Other packages required by your client script can be specified in ```experiment-settings.yaml```, but the following packages are installed by default:
@@ -65,7 +68,7 @@ The ```setup-clients.py``` script performs several actions:
 
 Each of these steps can be run separately as well.
 
-#### Important remark
+### Important remark
 Sometimes it is required to reboot the clients after the installation of UHD. This can be done using:
 ```
 python reboot-clients.py
@@ -75,7 +78,7 @@ It is recommended to follow-up with:
 python setup-clients.py --check-uhd-only
 ```
 
-#### Usage options
+### Usage options
 ```
 python setup-clients.py -h
 usage: setup-clients.py [-h] [--ansible-output] [--skip-apt] [--install-only] [--repos-only] [--check-uhd-only]
@@ -98,14 +101,14 @@ options:
   --check-uhd-only, -c  Only check if the UHD python API is available
 ```
 
-### 3. Running the experiment
+## 3. Running the experiment
 Running an experiment might be an iterative process.
 1. Make changes to ```experiment-settings.yaml```, your client script (or both)
 2. Run the experiment
 3. Collect your data
 4. Repeat
 
-#### 1. Updating your experiment
+### 1. Updating your experiment
 If you have changed your client script's arguments, created a new client script (or renamed it), it is important to update ```experiment-settings.yaml```. For example:
 
 ```yaml
@@ -121,7 +124,7 @@ Once you've made changes (step 1), it is important to push these changes to the 
 1. Push the modifications to your git repository using your preferred method
 2. Run ```python update-experiment.py```
 
-#### Usage options
+### Usage options
 ```
 python update-experiment.py -h
 usage: update-experiment.py [-h] [--ansible-output]
@@ -137,10 +140,10 @@ options:
   --ansible-output, -a  Enable ansible output
 ```
 
-#### 2. Running your experiment
+### 2. Running your experiment
 Now you can start your experiment. The ```run-clients.py``` allows you to start your all your client scripts (or stop a running script).
 
-#### Usage options
+### Usage options
 ```
 python run-clients.py -h
 usage: run-clients.py [-h] [--ansible-output] [--start] [--stop]
@@ -154,13 +157,13 @@ options:
   --stop                Stop the script
 ```
 
-#### 3. Collect your data
+### 3. Collect your data
 **TODO:** No scripts for collecting your data yet.
 
-### 4. Experiment clean-up
+## 4. Experiment clean-up
 Once your completely finished with an experiment. It is always good to clean-up the clients so the person using them after you doesn't run into any conflicts. In order to do so, use the ```cleanup-clients.py``` script.
 
-#### Usage options
+### Usage options
 ```
 python cleanup-clients.py -h
 usage: cleanup-clients.py [-h] [--ansible-output]
@@ -172,8 +175,14 @@ options:
   --ansible-output, -a  Enable ansible output
 ```
 
+---
 
+# Designing a new experiment
+In order to speed-up the development of new experiments, i.e., writing client and server scripts, we have provided several libraries:
+- USRP control: TODO
+- More: TODO
 
+---
 
 # Server–USRP Communication Standard
 
