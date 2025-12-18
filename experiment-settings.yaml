@@ -4,9 +4,17 @@
 experiment_repo: "demo-experiment"  # github repo name
 organisation: "techtile-by-dramco"  # github org
 
+# Server settings
+server:
+  host: "techtile-geof.local"
+  messaging_port: 5678
+  sync_port: 5679
+heartbeat_interval: 10
+
+
 # Tile settings
 #tiles: "segmentB segmentF"
-tiles: "ceiling"                   # group name, single tile, or space-separated list
+tiles: "A05"                   # group name, single tile, or space-separated list
 #tiles: "A05 A06 A07 A08 A09 A10"    # group name, single tile, or space-separated list
 
 extra_packages:                     # list of extra packages to be installed on the tiles' rpi's

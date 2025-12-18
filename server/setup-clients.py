@@ -218,33 +218,8 @@ if (not args.install_only) and (not args.check_uhd_only):
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
         else:
             print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
-       
-    print("Pulling the experiment repo:", experiment_repo ,"... ")
     
-    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
-        config.PROJECT_DIR,
-        playbook_path,
-        config.INVENTORY_PATH,
-        extra_vars={
-            'org_name': organisation,
-            'repo_name': experiment_repo
-        },
-        hosts=tiles,
-        mute_output= not(args.ansible_output),
-        suppress_warnings=True,
-        cleanup=True
-    )
-    
-    if not (nr_active_tiles == len(host_list)):
-        print("Unable to connect to all tiles.")
-        print("Inactive tiles:", failed_tiles)
-        if halt_on_connectivity_failure:
-            print("Aborting (halt_on_connectivity_failure = True)")
-            sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
-        else:
-            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
-    
-    print("Pulled all repositories on tiles(s):", tiles)
+    print("Pulled tile-managament repository on tiles(s):", tiles)
     prev_nr_active_tiles = nr_active_tiles
     
 if (not args.install_only) and (not args.repos_only):
