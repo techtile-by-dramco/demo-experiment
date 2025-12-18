@@ -50,13 +50,16 @@ usrp = USRP_Control(server)
 
 server.start() # optional
 usrp.start()
+usrp.set_required_hosts(host_list)
 
 # ---------------------------------------------------------
 # Main loop: monitor client connections and manage transmissions
 # ---------------------------------------------------------
 try:
-    usrp.send_command(usrp.Commands.SYNC, tiles = ["A10", "A11"], at=10, dir="RX", )
-    time.sleep(5)
+    usrp.wait_until_connected(["A05"])
+    usrp.send_command(usrp.Command.SYNC, tiles=["A05"], at=10, dir="RX", timeout_s=10)
+    print("sync completed")
+    time.sleep(10)
 except KeyboardInterrupt:
     # Catch Ctrl+C in main thread for clean shutdown
     pass

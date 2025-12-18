@@ -7,8 +7,7 @@ import yaml
 import zmq
 
 # from client_logger import get_logger
-from client_logger import *
-
+from .client_logger import *
 
 class Client:
     def __init__(self, config_path="client_config.yaml"):

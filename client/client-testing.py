@@ -18,16 +18,14 @@ client = None
 got_start = False
 
 
-def handle_tx_start(command, args):
-    print("Received tx-start command:", command, args)
+def handle_usrp_sync(command, args):
+    print("Received usrp_sync command:", command, args)
     
+    client.send("usrp_ack")
     global got_start
-    global duration
     
     got_start = True
-    _, _, val_str = args[0].partition("=")
-    duration = int(val_str)
-    
+
 
 def handle_signal(signum, frame):
     print("\nStopping client...")
@@ -42,7 +40,7 @@ CLOCK_TIMEOUT = 1000  # 1000mS timeout for external clock locking
 
 if __name__ == "__main__":
     client = Client(args.config_file)
-    client.on("tx-start", handle_tx_start)
+    client.on("usrp_sync", handle_usrp_sync)
     client.start()
     print("Client running...")
     
@@ -50,10 +48,9 @@ if __name__ == "__main__":
         while client.running:
             if got_start:
                 got_start = False
-                tx(duration, tx_streamer, rate, [channel])
-                client.send("tx-done")
-            else:
-                time.sleep(0.1)
+                time.sleep(5)
+                client.send("usrp_done")
+            time.sleep(0.1)
     except KeyboardInterrupt:
         pass
 
