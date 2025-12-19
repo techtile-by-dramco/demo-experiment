@@ -57,7 +57,7 @@ class USRP_Control:
 
             if timeout_s:
                 if time.monotonic() - start >= timeout_s:
-                    raise TimeoutError("Not all hosts connected in time.")
+                    raise TimeoutError(f"Not all hosts connected in time. Missing {missing_list}.")
 
             time.sleep(interval)
     
@@ -90,11 +90,6 @@ class USRP_Control:
                 CommandStatus.DONE. If omitted, wait indefinitely.
             - TODO: add command specific arguments
 
-        Returns
-        -------
-        ReturnCode
-            ReturnCode.OK if the command completes successfully on all tiles.
-
         Raises
         ------
         ConnectionError
@@ -102,10 +97,6 @@ class USRP_Control:
         TimeoutError
             If not all tiles report CommandStatus.DONE before the timeout expires.
         """
-        # start time for timeout
-        start = time.monotonic()
-        interval = 0.1
-        
         tiles = args.get("tiles", None)
         timeout_s = args.get("timeout_s", None)
         
@@ -131,24 +122,31 @@ class USRP_Control:
                 self.server.broadcast(command.value, json.dumps(args))
             
             # wait for "CommandStatus.DONE"
-            while True:
-                all_done = all(
-                    entry['command_status'] is self.CommandStatus.DONE
-                    for entry in self.required_hosts.values()
-                )
-                if all_done:
-                    break
-
-                # check for timeout
-                if timeout_s:
-                    if time.monotonic() - start >= timeout_s:
-                        print(self.required_hosts)
-                        raise TimeoutError("Not all hosts reported done in time.")
-
-                time.sleep(interval)
-                
-            return self.ReturnCode.OK
+            try:
+                self._wait_until_done(timeout_s)
+            except TimeoutError as e:
+                raise e
     
+    
+    def _wait_until_done(self, timeout_s = None):
+        start = time.monotonic()
+        interval = 0.1
+
+        while True:
+            all_done = all(
+                entry['command_status'] is self.CommandStatus.DONE
+                for entry in self.required_hosts.values()
+            )
+            if all_done:
+                break
+
+            # check for timeout
+            if timeout_s:
+                if time.monotonic() - start >= timeout_s:
+                    raise TimeoutError("Not all hosts reported done in time.")
+
+            time.sleep(interval)
+                
     
     def _check_connected(self, host_list=None):
         connected_hosts = self.server.get_connected()
@@ -165,16 +163,12 @@ class USRP_Control:
     def _handle_ack(self, id, args):
         try:
             self.required_hosts[id]["command_status"] = self.CommandStatus.ACK
-            print(self.required_hosts[id])
         except LookupError as e:
-            print("handle done error")
             raise LookupError(f"Got ACK from {id}, but it is not in required host list.\nAre other tiles still running?\n{e}")
         
         
     def _handle_done(self, id, args):
         try:
             self.required_hosts[id]["command_status"] = self.CommandStatus.DONE
-            print(self.required_hosts[id])
         except LookupError as e:
-            print("handle done error")
             raise LookupError(f"Got DONE from {id}, but it is not in required host list.\nAre other tiles still running?\n{e}")
