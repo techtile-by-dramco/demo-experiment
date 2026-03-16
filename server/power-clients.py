@@ -81,7 +81,7 @@ if snmp_user is None:
 if snmp_password is None:
     raise RuntimeError("SNMP_PASSWORD environment variable is not set")
 
-midspan = midspan_support_class(user=snmp_user, password=snmp_password)
+midspan = midspan_support_class(snmp_user, snmp_password)
 
 for tile in tiles:
     (poe_port, midspan_ip) = get_poe_info(tile)
