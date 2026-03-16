@@ -24,8 +24,35 @@ def get_poe_info(inventory, host):
     return poe_port, midspan_ip
 
 
+def ask_yes_no(prompt, default=True):
+    """
+    Ask a yes/no question via input() and return True/False.
+    
+    Parameters:
+        prompt (str): The question to show.
+        default (bool): Default choice if user presses Enter. True=yes, False=no.
+    
+    Returns:
+        bool: True for yes, False for no.
+    """
+    if default:
+        prompt_str = f"{prompt} [Y/n]: "
+    else:
+        prompt_str = f"{prompt} [y/N]: "
+
+    while True:
+        answer = input(prompt_str).strip().lower()
+        if not answer:  # Enter pressed
+            return default
+        if answer in ("y", "yes"):
+            return True
+        if answer in ("n", "no"):
+            return False
+        print("Please enter 'y(es)' or 'n(o)'.")
+        
+
 parser = argparse.ArgumentParser(
-    description="Control power of the tiles. CAREFUL! This will power up/down everything on the tile(s)."
+    description="Control power of the tiles. CAREFUL! This can power up/down everything on the tile(s). If no arguments are given, it will only show the power status of the hosts."
 )
 
 parser.add_argument(
@@ -86,8 +113,14 @@ if snmp_password is None:
 
 midspan = midspan_support_class(snmp_user, snmp_password)
 
+if args.power_down:
+    if not ask_yes_no("Powering down tiles, are you sure you want to continue?"):
+        print("aborting")
+        quit()
+    
 for host in host_list:
     (poe_port, midspan_ip) = get_poe_info(inventory, host)
+    
     print("midspan ip:", midspan_ip)
     print("poe port:", poe_port)
     
