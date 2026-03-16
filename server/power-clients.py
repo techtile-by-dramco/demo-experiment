@@ -4,12 +4,32 @@ import yaml
 import argparse
 import config
 
+def get_poe_info(inventory, host):
+    hosts = inventory["all"]["hosts"]
+    midspans = inventory["all"]["vars"]["midspans"]
+
+    if host not in hosts:
+        raise ValueError(f"Host {host} not found")
+
+    host_data = hosts[host]
+
+    poe_port = host_data.get("poe-port")
+    midspan = host_data.get("midspan")
+
+    if not midspan:
+        return None
+
+    midspan_ip = midspans[midspan]["ip"]
+
+    return poe_port, midspan_ip
+
+
 parser = argparse.ArgumentParser(
-    description="Reboot the raspberry pi's on the tiles."
+    description="Control power of the tiles. CAREFUL! This will power up/down everything on the tile(s)."
 )
 
 parser.add_argument(
-    "--ansible-output", "-a",
+    "--power-up", "-u",
     action="store_true",
     help="Enable ansible output"
 )
@@ -54,3 +74,12 @@ if snmp_user is None:
     raise RuntimeError("SNMP_USER environment variable is not set")
 if snmp_password is None:
     raise RuntimeError("SNMP_PASSWORD environment variable is not set")
+
+midspan = midspan_support_class(user=snmp_user, password=snmp_password)
+
+for tile in tiles:
+    (poe_port, midspan_ip) = get_poe_info(tile)
+    print("midspan ip:", midspan_ip)
+    print("poe port:", poe_port)
+    print("port status:", midspan.getPortStatus(midspan_ip, poe_port))
+          
