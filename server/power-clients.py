@@ -73,6 +73,9 @@ halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_fai
 host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
 print("Working on", len(host_list) ,"tile(s):", tiles)
 
+with open(config.INVENTORY_PATH)as f:
+    inventory = yaml.safe_load(f)
+
 snmp_user = os.getenv("SNMP_USER")
 snmp_password = os.getenv("SNMP_PASSWORD")
 
@@ -84,7 +87,7 @@ if snmp_password is None:
 midspan = midspan_support_class(snmp_user, snmp_password)
 
 for tile in tiles:
-    (poe_port, midspan_ip) = get_poe_info(tile)
+    (poe_port, midspan_ip) = get_poe_info(inventory, tile)
     print("midspan ip:", midspan_ip)
     print("poe port:", poe_port)
     print("port status:", midspan.getPortStatus(midspan_ip, poe_port))
