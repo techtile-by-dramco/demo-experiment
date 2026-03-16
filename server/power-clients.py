@@ -90,7 +90,7 @@ if snmp_password is None:
 midspan = midspan_support_class(snmp_user, snmp_password)
 
 for tile in tiles:
-    print(tiles)
+    print(host_list)
     print(tile)
     (poe_port, midspan_ip) = get_poe_info(inventory, tile)
     print("midspan ip:", midspan_ip)
