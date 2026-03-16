@@ -91,5 +91,5 @@ for host in host_list:
     print("midspan ip:", midspan_ip)
     print("poe port:", poe_port)
     
-    print("port status:", midspan.getPortStatusOld(midspan_ip, poe_port))
+    print("port status:", midspan.getPortStatus(midspan_ip, poe_port))
           
