@@ -117,11 +117,19 @@ if args.power_down:
     if not ask_yes_no("Powering down tiles, are you sure you want to continue?"):
         print("Power-down aborted.")
         quit()
+    else:
+        for host in host_list:
+            (poe_port, midspan_ip) = get_poe_info(inventory, host)
+            midspan.setPortOnOff(midspan_ip, poe_port, 0)
         
 if args.power_up:
     if not ask_yes_no("Powering up tiles, are you sure you want to continue?"):
         print("Power-up aborted.")
         quit()
+    else:
+        for host in host_list:
+            (poe_port, midspan_ip) = get_poe_info(inventory, host)
+            midspan.setPortOnOff(midspan_ip, poe_port, 1)
         
 for host in host_list:
     (poe_port, midspan_ip) = get_poe_info(inventory, host)
