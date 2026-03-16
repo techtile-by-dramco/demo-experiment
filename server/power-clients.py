@@ -115,9 +115,14 @@ midspan = midspan_support_class(snmp_user, snmp_password)
 
 if args.power_down:
     if not ask_yes_no("Powering down tiles, are you sure you want to continue?"):
-        print("aborting")
+        print("Power-down aborted.")
         quit()
-    
+        
+if args.power_up:
+    if not ask_yes_no("Powering up tiles, are you sure you want to continue?"):
+        print("Power-up aborted.")
+        quit()
+        
 for host in host_list:
     (poe_port, midspan_ip) = get_poe_info(inventory, host)
     
