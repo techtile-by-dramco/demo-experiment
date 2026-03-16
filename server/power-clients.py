@@ -5,6 +5,9 @@ import argparse
 import config
 
 def get_poe_info(inventory, host):
+    print(inventory)
+    print(host)
+    
     hosts = inventory["all"]["hosts"]
     midspans = inventory["all"]["vars"]["midspans"]
 
