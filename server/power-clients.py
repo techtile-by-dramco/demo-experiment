@@ -5,7 +5,7 @@ import argparse
 import config
 
 def get_poe_info(inventory, host):
-    print(inventory)
+    #print(inventory)
     print(host)
     
     hosts = inventory["all"]["hosts"]
@@ -90,6 +90,8 @@ if snmp_password is None:
 midspan = midspan_support_class(snmp_user, snmp_password)
 
 for tile in tiles:
+    print(tiles)
+    print(tile)
     (poe_port, midspan_ip) = get_poe_info(inventory, tile)
     print("midspan ip:", midspan_ip)
     print("poe port:", poe_port)
