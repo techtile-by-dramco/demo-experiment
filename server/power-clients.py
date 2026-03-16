@@ -31,7 +31,13 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "--power-up", "-u",
     action="store_true",
-    help="Enable ansible output"
+    help="Power-up a tile."
+)
+
+parser.add_argument(
+    "--power-down", "-d",
+    action="store_true",
+    help="Power-down a tile."
 )
 
 args = parser.parse_args()
