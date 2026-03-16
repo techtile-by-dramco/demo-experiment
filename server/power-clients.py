@@ -90,5 +90,6 @@ for host in host_list:
     (poe_port, midspan_ip) = get_poe_info(inventory, host)
     print("midspan ip:", midspan_ip)
     print("poe port:", poe_port)
-    print("port status:", midspan.getPortStatus(midspan_ip, poe_port))
+    
+    print("port status:", midspan.getPortStatusOld(midspan_ip, poe_port))
           
