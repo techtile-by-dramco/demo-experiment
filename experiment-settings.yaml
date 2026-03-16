@@ -12,7 +12,7 @@ server:
 heartbeat_interval: 10
 
 
-# Tile settings
+# List of tiles or groups to run general management scripts on.
 #tiles: "segmentB segmentF"
 tiles: "A01"                   # group name, single tile, or space-separated list
 #tiles: "A05 A06 A07 A08 A09 A10"    # group name, single tile, or space-separated list
@@ -23,10 +23,23 @@ extra_packages:                     # list of extra packages to be installed on 
   - python3-zmq
 
 # Name of the script to run on the clients (make sure it is in the <your-repo>/client folder)
+# 1) This is soon to be deprecated
 client_script_name: "client-testing.py"
 client_script_args:
   - "--config-file"
   - "/home/pi/demo-experiment/experiment-settings.yaml" 
+# 2) Use this instead
+client_scripts:
+  - name: "client-testing.py"
+    args:
+      - "--config-file"
+      - "/home/pi/demo-experiment/experiment-settings.yaml" 
+    tiles: "ceiling"
+  - name: "some-other-script.py"
+    args:
+      - "--config-file"
+      - "/home/pi/demo-experiment/experiment-settings.yaml" 
+    tiles: "wallEast"
 
 # Server script behaviour
 test_connectivity: False             # set True if you want to test tile connectivity before continuing.
