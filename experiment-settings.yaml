@@ -43,4 +43,4 @@ client_scripts:
 
 # Server script behaviour
 test_connectivity: True             # set True if you want to test tile connectivity before continuing.
-halt_on_connectivity_failure: True  # set False if you want to continue with only the active tiles
+halt_on_connectivity_failure: False  # set False if you want to continue with only the active tiles
