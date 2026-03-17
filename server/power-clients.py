@@ -96,7 +96,7 @@ if args.power_down:
         print("Power-down aborted.")
         quit()
     else:
-        print(midspan.setPortOnOff(host_list, midspan_support_class.OFF))
+        midspan.setPortOnOff(host_list, midspan_support_class.OFF)
 
         
 if args.power_up:
@@ -104,7 +104,7 @@ if args.power_up:
         print("Power-up aborted.")
         quit()
     else:
-        print(midspan.setPortOnOff(host_list, midspan_support_class.ON))
+        midspan.setPortOnOff(host_list, midspan_support_class.ON)
 
 
 # if args.power_down:
