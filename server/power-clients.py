@@ -98,8 +98,11 @@ if args.power_down:
     else:
         for host in host_list:
             midspan.setPortOnOff(host, 0)
-        print("Waiting for changes to be applied...")
-        time.sleep(2)
+        print("Waiting for changes to be applied ", end="")
+        for i in range(4):
+            print(".", end="")
+            time.sleep(1)
+        print(".")
         
 if args.power_up:
     if not ask_yes_no("Powering up tiles, are you sure you want to continue?"):
@@ -108,8 +111,11 @@ if args.power_up:
     else:
         for host in host_list:
             midspan.setPortOnOff(host, 1)
-        print("Waiting for changes to be applied...")
-        time.sleep(2)
+        print("Waiting for changes to be applied ", end="")
+        for i in range(4):
+            print(".", end="")
+            time.sleep(1)
+        print(".")
 
 if len(host_list) > 0:
     print("┌───────┬────────┬─────────┬───────────┬───────────┐")
