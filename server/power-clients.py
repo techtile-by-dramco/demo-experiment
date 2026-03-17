@@ -107,8 +107,5 @@ if args.power_up:
             midspan.setPortOnOff(host)
         
 for host in host_list:
-    print("midspan ip:", midspan_ip)
-    print("poe port:", poe_port)
-    
-    print("port status:", midspan.getPortStatus(host))
+    print(host, "-", midspan.getPortStatus(host))
           
