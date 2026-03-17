@@ -42,5 +42,5 @@ client_scripts:
     tiles: "wallEast"
 
 # Server script behaviour
-test_connectivity: False             # set True if you want to test tile connectivity before continuing.
-halt_on_connectivity_failure: False  # set False if you want to continue with only the active tiles
+test_connectivity: True             # set True if you want to test tile connectivity before continuing.
+halt_on_connectivity_failure: True  # set False if you want to continue with only the active tiles
