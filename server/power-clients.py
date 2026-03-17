@@ -4,26 +4,6 @@ import yaml
 import argparse
 import config
 
-def get_poe_info(inventory, host):
-    hosts = inventory["all"]["hosts"]
-    midspans = inventory["all"]["vars"]["midspans"]
-
-    if host not in hosts:
-        raise ValueError(f"Host {host} not found")
-
-    host_data = hosts[host]
-
-    poe_port = host_data.get("poe-port")
-    midspan = host_data.get("midspan")
-
-    if not midspan:
-        return None
-
-    midspan_ip = midspans[midspan]["ip"]
-
-    return poe_port, midspan_ip
-
-
 def ask_yes_no(prompt, default=True):
     """
     Ask a yes/no question via input() and return True/False.
@@ -100,9 +80,6 @@ halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_fai
 host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
 print("Working on", len(host_list) ,"tile(s):", tiles)
 
-with open(config.INVENTORY_PATH)as f:
-    inventory = yaml.safe_load(f)
-
 snmp_user = os.getenv("SNMP_USER")
 snmp_password = os.getenv("SNMP_PASSWORD")
 
@@ -119,8 +96,7 @@ if args.power_down:
         quit()
     else:
         for host in host_list:
-            (poe_port, midspan_ip) = get_poe_info(inventory, host)
-            midspan.setPortOnOff(midspan_ip, poe_port, 0)
+            midspan.setPortOnOff(host)
         
 if args.power_up:
     if not ask_yes_no("Powering up tiles, are you sure you want to continue?"):
@@ -128,14 +104,11 @@ if args.power_up:
         quit()
     else:
         for host in host_list:
-            (poe_port, midspan_ip) = get_poe_info(inventory, host)
-            midspan.setPortOnOff(midspan_ip, poe_port, 1)
+            midspan.setPortOnOff(host)
         
 for host in host_list:
-    (poe_port, midspan_ip) = get_poe_info(inventory, host)
-    
     print("midspan ip:", midspan_ip)
     print("poe port:", poe_port)
     
-    print("port status:", midspan.getPortStatus(midspan_ip, poe_port))
+    print("port status:", midspan.getPortStatus(host))
           
