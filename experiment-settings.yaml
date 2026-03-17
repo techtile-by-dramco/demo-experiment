@@ -14,7 +14,7 @@ heartbeat_interval: 10
 
 # List of tiles or groups to run general management scripts on.
 #tiles: "segmentB segmentF"
-tiles: "ceiling wallEast wallWest"                   # group name, single tile, or space-separated list
+tiles: "ceiling walls"                   # group name, single tile, or space-separated list
 #tiles: "A05 C03"    # group name, single tile, or space-separated list
 
 extra_packages:                     # list of extra packages to be installed on the tiles' rpi's
