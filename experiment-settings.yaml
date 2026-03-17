@@ -11,7 +11,6 @@ server:
   sync_port: 5679
 heartbeat_interval: 10
 
-
 # List of tiles or groups to run general management scripts on.
 #tiles: "segmentB segmentF"
 #tiles: "ceiling walls"                   # group name, single tile, or space-separated list
