@@ -260,6 +260,7 @@ if (not args.install_only) and (not args.repos_only):
     
 failed_summary = " ".join(all_failed_tiles)
 if failed_summary:
-    print("Not all requested operations succeeded. Check tiles:", failed_summary)
+    print("Not all operations were succesful on every tile.")
+    print("Check tiles:", failed_summary)
     
 print("Done.")
