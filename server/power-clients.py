@@ -96,7 +96,7 @@ if args.power_down:
         quit()
     else:
         for host in host_list:
-            midspan.setPortOnOff(host)
+            midspan.setPortOnOff(host, 0)
         
 if args.power_up:
     if not ask_yes_no("Powering up tiles, are you sure you want to continue?"):
@@ -104,8 +104,17 @@ if args.power_up:
         quit()
     else:
         for host in host_list:
-            midspan.setPortOnOff(host)
-        
+            midspan.setPortOnOff(host, 1)
+
+if len(host_list) > 0:
+    print("| Host  | on/off | power   | max. pow. | poe class |")
+    print("|-------|--------|---------|-----------|-----------|")
 for host in host_list:
-    print(host, "-", midspan.getPortStatus(host))
+    (onOff, portPower, portMaxPower, poeClass) = midspan.getPortStatus(host)
+    sstr = ""
+    if onOff == 1:
+        sstr = "on "
+    else:
+        sstr = "off"
+    print(f"| {host:s}   | {sstr:s} | {portPower:<8d} | {portMaxPower:<8d} | {poeClass:<8d} |")
           
