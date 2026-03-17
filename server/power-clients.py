@@ -98,7 +98,7 @@ if args.power_down:
     else:
         print("Applying changes ", end="", flush=True)
         for host in host_list:
-            midspan.setPortOnOff(host, 0)
+            midspan.setPortOnOff(host, midspan_support_class.OFF)
         for i in range(4):
             print(".", end="", flush=True)
             time.sleep(1)
@@ -112,7 +112,7 @@ if args.power_up:
     else:
         print("Applying changes ", end="", flush=True)
         for host in host_list:
-            midspan.setPortOnOff(host, 1)
+            midspan.setPortOnOff(host, midspan_support_class.ON)
         for i in range(4):
             print(".", end="", flush=True)
             time.sleep(1)
