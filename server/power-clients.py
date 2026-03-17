@@ -116,5 +116,5 @@ for host in host_list:
         sstr = "on "
     else:
         sstr = "off"
-    print(f"| {host:s}   | {sstr:s} | {portPower:<8d} | {portMaxPower:<8d} | {poeClass:<8d} |")
+    print(f"| {host:s}   | {sstr:s}   | {portPower:<8d} | {portMaxPower:<8d} | {poeClass:<8d} |")
           
