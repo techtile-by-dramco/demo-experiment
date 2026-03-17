@@ -96,13 +96,7 @@ if args.power_down:
         print("Power-down aborted.")
         quit()
     else:
-        print("Applying changes ", end="", flush=True)
-        for host in host_list:
-            midspan.setPortOnOff(host, midspan_support_class.OFF)
-        for i in range(4):
-            print(".", end="", flush=True)
-            time.sleep(1)
-        print(".", flush=True)
+        midspan.setPortOnOff(host_list, midspan_support_class.OFF)
 
         
 if args.power_up:
@@ -110,13 +104,35 @@ if args.power_up:
         print("Power-up aborted.")
         quit()
     else:
-        print("Applying changes ", end="", flush=True)
-        for host in host_list:
-            midspan.setPortOnOff(host, midspan_support_class.ON)
-        for i in range(4):
-            print(".", end="", flush=True)
-            time.sleep(1)
-        print(".", flush=True)
+        midspan.setPortOnOff(host_list, midspan_support_class.ON)
+
+
+# if args.power_down:
+#     if not ask_yes_no("Powering down tiles, are you sure you want to continue?"):
+#         print("Power-down aborted.")
+#         quit()
+#     else:
+#         print("Applying changes ", end="", flush=True)
+#         for host in host_list:
+#             midspan.setPortOnOff(host, midspan_support_class.OFF)
+#         for i in range(4):
+#             print(".", end="", flush=True)
+#             time.sleep(1)
+#         print(".", flush=True)
+
+        
+# if args.power_up:
+#     if not ask_yes_no("Powering up tiles, are you sure you want to continue?"):
+#         print("Power-up aborted.")
+#         quit()
+#     else:
+#         print("Applying changes ", end="", flush=True)
+#         for host in host_list:
+#             midspan.setPortOnOff(host, midspan_support_class.ON)
+#         for i in range(4):
+#             print(".", end="", flush=True)
+#             time.sleep(1)
+#         print(".", flush=True)
 
 if len(host_list) > 0:
     print("┌───────┬────────┬─────────┬───────────┬───────────┐")
