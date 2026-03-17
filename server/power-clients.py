@@ -48,6 +48,11 @@ parser.add_argument(
     help="Power-down a tile."
 )
 
+parser.add_argument(
+    "--tiles", "-t",
+    help="Optional list of tiles."
+)
+
 args = parser.parse_args()
 
 # We start by setting some paths
@@ -69,7 +74,10 @@ print("Experiment project directory: ", config.PROJECT_DIR) # should point to ti
 with open(settings_path, "r") as f:
     experiment_settings = yaml.safe_load(f)
 
-tiles = experiment_settings.get("tiles", "")
+if parser.tiles:
+    tiles = parser.tiles
+else:
+    tiles = experiment_settings.get("tiles", "")
 if len(tiles) == 0:
     print("The experiment doesn't target any tiles.")
     sys.exit(config.ERRORS["NO_TILES_ERROR"])
