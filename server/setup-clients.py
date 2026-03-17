@@ -241,6 +241,9 @@ if (not args.install_only) and (not args.repos_only):
         cleanup=True
     )
     
+    print(nr_active_tiles)
+    print(failed_tiles)
+    
     if not (nr_active_tiles == len(host_list)):
         print("Unable to connect to all tiles.")
         print("Inactive tiles:", failed_tiles)
