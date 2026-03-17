@@ -74,8 +74,8 @@ print("Experiment project directory: ", config.PROJECT_DIR) # should point to ti
 with open(settings_path, "r") as f:
     experiment_settings = yaml.safe_load(f)
 
-if parser.tiles:
-    tiles = parser.tiles
+if args.tiles:
+    tiles = args.tiles
 else:
     tiles = experiment_settings.get("tiles", "")
 if len(tiles) == 0:
