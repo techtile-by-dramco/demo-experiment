@@ -107,6 +107,7 @@ if args.power_up:
             midspan.setPortOnOff(host, 1)
 
 if len(host_list) > 0:
+    print("|-------|--------|---------|-----------|-----------|")
     print("| Host  | on/off | power   | max. pow. | poe class |")
     print("|-------|--------|---------|-----------|-----------|")
 for host in host_list:
@@ -116,5 +117,6 @@ for host in host_list:
         sstr = "on "
     else:
         sstr = "off"
-    print(f"| {host:s}   | {sstr:s}   | {portPower:<8d} | {portMaxPower:<8d} | {poeClass:<8d} |")
-          
+    print(f"| {host:s}   | {sstr:s}    | {portPower:<7d} | {portMaxPower:<8d} | {poeClass:<9d} |")
+if len(host_list) > 0:
+    print("|-------|--------|---------|-----------|-----------|")    
