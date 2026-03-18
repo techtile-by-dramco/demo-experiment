@@ -41,29 +41,32 @@ print("Experiment project directory: ", config.PROJECT_DIR) # should point to ti
 with open(settings_path, "r") as f:
     experiment_settings = yaml.safe_load(f)
 
-tiles = experiment_settings.get("tiles", "")
-if len(tiles) == 0:
-    print("The experiment doesn't target any tiles.")
-    sys.exit(config.ERRORS["NO_TILES_ERROR"])
 test_connectivity = experiment_settings.get("test_connectivity", True)
 halt_on_connectivity_failure = experiment_settings.get("halt_on_connectivity_failure", True)
 extra_packages = experiment_settings.get("extra_packages", "")
 experiment_repo = experiment_settings.get("experiment_repo", "")
 organisation = experiment_settings.get("organisation", "")
-client_script = experiment_settings.get("script", "")
 client_scripts = experiment_settings.get("client_scripts", [])
 script_full_path = os.path.join("/home/pi", experiment_repo, "experiment-settings.yaml")
 script_working_dir = os.path.join("/home/pi", experiment_repo, "data")
 
 print(client_scripts)
-quit()
 
 # host list can be used to identify individual tiles from group names
 # We don't need it to run ansible playbooks, but it is a first check to see if the tiles are specified correctly
-host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
+for script in client_scripts:
+    tiles = script["tiles"]
+    if len(tiles) == 0:
+        print("Experiment script", script["name"] ,"doesn't target any tiles.")
+        sys.exit(config.ERRORS["NO_TILES_ERROR"])    
+    host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
+    # reassign tiles, wrongly specified tiles have been removed from list
+    script["tiles"] = " ".join(host_list)
 
 # reassign tiles, wrongly specified tiles have been removed from list
-tiles = " ".join(host_list)
+print(client_scripts)
+quit()
+
 print("Working on", len(host_list) ,"tile(s):", tiles)
 
 # First we test connectivity
