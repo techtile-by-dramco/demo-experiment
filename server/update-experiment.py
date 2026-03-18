@@ -50,10 +50,7 @@ client_scripts = experiment_settings.get("client_scripts", [])
 script_full_path = os.path.join("/home/pi", experiment_repo, "experiment-settings.yaml")
 script_working_dir = os.path.join("/home/pi", experiment_repo, "data")
 
-print(client_scripts)
-
-# host list can be used to identify individual tiles from group names
-# We don't need it to run ansible playbooks, but it is a first check to see if the tiles are specified correctly
+# handle each script separately
 for script in client_scripts:
     tiles = script["tiles"]
     if len(tiles) == 0:
@@ -61,33 +58,58 @@ for script in client_scripts:
         sys.exit(config.ERRORS["NO_TILES_ERROR"])    
     host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
     # reassign tiles, wrongly specified tiles have been removed from list
-    script["tiles"] = " ".join(host_list)
+    tiles = " ".join(host_list)
 
-# reassign tiles, wrongly specified tiles have been removed from list
-print(client_scripts)
-quit()
+    # First we test connectivity
+    nr_active_tiles = 0
+    all_failed_tiles = []
+    if test_connectivity:
+        print("Testing connectivity ... ")
+        playbook_path = os.path.join(config.PLAYBOOK_DIR, "ping.yaml")
 
-print("Working on", len(host_list) ,"tile(s):", tiles)
+        (nr_active_tiles, tiles, failed_tiles) = run_playbook(
+            config.PROJECT_DIR,
+            playbook_path,
+            config.INVENTORY_PATH,
+            extra_vars=None,
+            hosts=tiles,
+            mute_output=not(args.ansible_output),
+            suppress_warnings=True,
+            cleanup=True
+        )
 
-# First we test connectivity
-nr_active_tiles = 0
-all_failed_tiles = []
-if test_connectivity:
-    print("Testing connectivity ... ")
-    playbook_path = os.path.join(config.PLAYBOOK_DIR, "ping.yaml")
+        if not (nr_active_tiles == len(host_list)):
+            print("Unable to connect to all tiles.")
+            print("Inactive tiles:", failed_tiles)
+            all_failed_tiles.append(failed_tiles)
+            if halt_on_connectivity_failure:
+                print("Aborting (halt_on_connectivity_failure = True)")
+                sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+            else:
+                print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
+    else:
+        # we did not test connectivity so we assume all tiles are active
+        nr_active_tiles = len(host_list)
+        
+    prev_nr_active_tiles = nr_active_tiles
+
+    print("Stopping experiment-launcher.service ... ")
+    playbook_path = os.path.join(config.PLAYBOOK_DIR, "manage-service.yaml")
 
     (nr_active_tiles, tiles, failed_tiles) = run_playbook(
         config.PROJECT_DIR,
         playbook_path,
         config.INVENTORY_PATH,
-        extra_vars=None,
+        extra_vars={
+            'service_state': 'stopped',
+        },
         hosts=tiles,
         mute_output=not(args.ansible_output),
         suppress_warnings=True,
         cleanup=True
     )
 
-    if not (nr_active_tiles == len(host_list)):
+    if not (nr_active_tiles == prev_nr_active_tiles):
         print("Unable to connect to all tiles.")
         print("Inactive tiles:", failed_tiles)
         all_failed_tiles.append(failed_tiles)
@@ -96,105 +118,74 @@ if test_connectivity:
             sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
         else:
             print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
-else:
-    # we did not test connectivity so we assume all tiles are active
-    nr_active_tiles = len(host_list)
-    
-prev_nr_active_tiles = nr_active_tiles
 
-print("Stopping experiment-launcher.service ... ")
-playbook_path = os.path.join(config.PLAYBOOK_DIR, "manage-service.yaml")
+    prev_nr_active_tiles = nr_active_tiles
 
-(nr_active_tiles, tiles, failed_tiles) = run_playbook(
-    config.PROJECT_DIR,
-    playbook_path,
-    config.INVENTORY_PATH,
-    extra_vars={
-        'service_state': 'stopped',
-    },
-    hosts=tiles,
-    mute_output=not(args.ansible_output),
-    suppress_warnings=True,
-    cleanup=True
-)
+    print("Experiment stopped on tiles(s):", tiles)
 
-if not (nr_active_tiles == prev_nr_active_tiles):
-    print("Unable to connect to all tiles.")
-    print("Inactive tiles:", failed_tiles)
-    all_failed_tiles.append(failed_tiles)
-    if halt_on_connectivity_failure:
-        print("Aborting (halt_on_connectivity_failure = True)")
-        sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
-    else:
-        print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
+    print("Pulling the experiment repo:", experiment_repo ,"... ")
+    playbook_path = os.path.join(config.PLAYBOOK_DIR, "pull-repo.yaml")
 
-prev_nr_active_tiles = nr_active_tiles
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
+        config.PROJECT_DIR,
+        playbook_path,
+        config.INVENTORY_PATH,
+        extra_vars={
+            'org_name': organisation,
+            'repo_name': experiment_repo
+        },
+        hosts=tiles,
+        mute_output= not(args.ansible_output),
+        suppress_warnings=True,
+        cleanup=True
+    )
 
-print("Experiment stopped on tiles(s):", tiles)
+    if not (nr_active_tiles == prev_nr_active_tiles):
+        print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
+        all_failed_tiles.append(failed_tiles)
+        if halt_on_connectivity_failure:
+            print("Aborting (halt_on_connectivity_failure = True)")
+            sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
 
-print("Pulling the experiment repo:", experiment_repo ,"... ")
-playbook_path = os.path.join(config.PLAYBOOK_DIR, "pull-repo.yaml")
+    print("Pulled repository on tiles(s):", tiles)
+    prev_nr_active_tiles = nr_active_tiles
 
-(nr_active_tiles, tiles, failed_tiles) = run_playbook(
-    config.PROJECT_DIR,
-    playbook_path,
-    config.INVENTORY_PATH,
-    extra_vars={
-        'org_name': organisation,
-        'repo_name': experiment_repo
-    },
-    hosts=tiles,
-    mute_output= not(args.ansible_output),
-    suppress_warnings=True,
-    cleanup=True
-)
+    print("Installing client script:", script["name"], "... ")
+    playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
 
-if not (nr_active_tiles == prev_nr_active_tiles):
-    print("Unable to connect to all tiles.")
-    print("Inactive tiles:", failed_tiles)
-    all_failed_tiles.append(failed_tiles)
-    if halt_on_connectivity_failure:
-        print("Aborting (halt_on_connectivity_failure = True)")
-        sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
-    else:
-        print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
+    (nr_active_tiles, tiles, failed_tiles) = run_playbook(
+        config.PROJECT_DIR,
+        playbook_path,
+        config.INVENTORY_PATH,
+        extra_vars={
+            'script_path': os.path.join(config.TILE_MANAGEMENT_REPO_DIR, 'tiles/install-experiment.sh'),
+            'sudo': 'yes',
+            'script_args': ' '.join(['install', script_full_path, script_working_dir])
+        },
+        hosts=tiles,
+        mute_output=not(args.ansible_output),
+        suppress_warnings=True,
+        cleanup=True
+    )
 
-print("Pulled repository on tiles(s):", tiles)
-prev_nr_active_tiles = nr_active_tiles
+    if not (nr_active_tiles == prev_nr_active_tiles):
+        print("Unable to connect to all tiles.")
+        print("Inactive tiles:", failed_tiles)
+        all_failed_tiles.append(failed_tiles)
+        if halt_on_connectivity_failure:
+            print("Aborting (halt_on_connectivity_failure = True)")
+            sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
+        else:
+            print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
 
-print("Installing client script:", client_script, "... ")
-playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
+    print("Updated experiment client script on tiles(s):", tiles)
 
-(nr_active_tiles, tiles, failed_tiles) = run_playbook(
-    config.PROJECT_DIR,
-    playbook_path,
-    config.INVENTORY_PATH,
-    extra_vars={
-        'script_path': os.path.join(config.TILE_MANAGEMENT_REPO_DIR, 'tiles/install-experiment.sh'),
-        'sudo': 'yes',
-        'script_args': ' '.join(['install', script_full_path, script_working_dir])
-    },
-    hosts=tiles,
-    mute_output=not(args.ansible_output),
-    suppress_warnings=True,
-    cleanup=True
-)
-
-if not (nr_active_tiles == prev_nr_active_tiles):
-    print("Unable to connect to all tiles.")
-    print("Inactive tiles:", failed_tiles)
-    all_failed_tiles.append(failed_tiles)
-    if halt_on_connectivity_failure:
-        print("Aborting (halt_on_connectivity_failure = True)")
-        sys.exit(config.ERRORS["CONNECTIVITY_ERROR"])
-    else:
-        print("Proceeding with", nr_active_tiles, "tiles(s):", tiles)
-
-print("Updated experiment client script on tiles(s):", tiles)
-
-failed_summary = " ".join(all_failed_tiles)
-if failed_summary:
-    print("Not all operations were succesful on every tile.")
-    print("Check tiles:", failed_summary)
+    failed_summary = " ".join(all_failed_tiles)
+    if failed_summary:
+        print("Not all operations were succesful on every tile.")
+        print("Check tiles:", failed_summary)
 
 print("Done.")
