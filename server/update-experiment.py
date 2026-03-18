@@ -47,14 +47,20 @@ extra_packages = experiment_settings.get("extra_packages", "")
 experiment_repo = experiment_settings.get("experiment_repo", "")
 organisation = experiment_settings.get("organisation", "")
 client_scripts = experiment_settings.get("client_scripts", [])
-script_full_path = os.path.join("/home/pi", experiment_repo, "experiment-settings.yaml")
+settings_full_path = os.path.join("/home/pi", experiment_repo, "experiment-settings.yaml")
 script_working_dir = os.path.join("/home/pi", experiment_repo, "data")
 
+print("Detected", str(len(client_scripts)), "client scripts.")
+
 # handle each script separately
+script_index = -1
 for script in client_scripts:
-    tiles = script["tiles"]
+    script_name = script.get("name", "NAME_NOT_FOUND")
+    print("Updating experiment for tiles that run client script", script_name)
+    script_index += 1 
+    tiles = script.get("tiles", "")
     if len(tiles) == 0:
-        print("Experiment script", script["name"] ,"doesn't target any tiles.")
+        print("Experiment script", script_name, "doesn't target any tiles.")
         sys.exit(config.ERRORS["NO_TILES_ERROR"])    
     host_list = get_target_hosts(config.INVENTORY_PATH, limit=tiles, suppress_warnings=True)
     # reassign tiles, wrongly specified tiles have been removed from list
@@ -153,7 +159,7 @@ for script in client_scripts:
     print("Pulled repository on tiles(s):", tiles)
     prev_nr_active_tiles = nr_active_tiles
 
-    print("Installing client script:", script["name"], "... ")
+    print("Installing client script:", script_name, "... ")
     playbook_path = os.path.join(config.PLAYBOOK_DIR, "run-script.yaml")
 
     (nr_active_tiles, tiles, failed_tiles) = run_playbook(
@@ -163,7 +169,7 @@ for script in client_scripts:
         extra_vars={
             'script_path': os.path.join(config.TILE_MANAGEMENT_REPO_DIR, 'tiles/install-experiment.sh'),
             'sudo': 'yes',
-            'script_args': ' '.join(['install', script_full_path, script_working_dir])
+            'script_args': ' '.join(['install', settings_full_path, str(script_index), script_working_dir])
         },
         hosts=tiles,
         mute_output=not(args.ansible_output),
