@@ -29,16 +29,20 @@ client_script_args:
   - "/home/pi/demo-experiment/experiment-settings.yaml" 
 # 2) Use this instead
 client_scripts:
-  - name: "client-testing.py"
+  - name: "testscript1.py"
     args:
-      - "--config-file"
-      - "/home/pi/demo-experiment/experiment-settings.yaml" 
-    tiles: "ceiling"
-  - name: "some-other-script.py"
+      - "16"
+      - "500"
+      - "--delay"
+      - "0.2"
+    tiles: "segmentA segmentC segmentE segmentG"
+  - name: "testscript2.py"
     args:
-      - "--config-file"
-      - "/home/pi/demo-experiment/experiment-settings.yaml" 
-    tiles: "wallEast"
+      - "26"
+      - "200"
+      - "--delay"
+      - "0.5"
+    tiles: "segmentB segmentD segmentF"
 
 # Server script behaviour
 test_connectivity: True             # set True if you want to test tile connectivity before continuing.
