@@ -21,13 +21,8 @@ extra_packages:                     # list of extra packages to be installed on 
   - python3-scipy
   - python3-zmq
 
-# Name of the script to run on the clients (make sure it is in the <your-repo>/client folder)
-# 1) This is soon to be deprecated
-client_script_name: "client-testing.py"
-client_script_args:
-  - "--config-file"
-  - "/home/pi/demo-experiment/experiment-settings.yaml" 
-# 2) Use this instead
+# List of scripts that need to run on the clients (make sure it is in the <your-repo>/client folder)
+# One script per client, but different scripts can be deployed
 client_scripts:
   - name: "testscript1.py"
     args:
