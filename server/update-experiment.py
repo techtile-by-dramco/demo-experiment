@@ -51,8 +51,12 @@ extra_packages = experiment_settings.get("extra_packages", "")
 experiment_repo = experiment_settings.get("experiment_repo", "")
 organisation = experiment_settings.get("organisation", "")
 client_script = experiment_settings.get("script", "")
+client_scripts = experiment_settings.get("client_scripts", [])
 script_full_path = os.path.join("/home/pi", experiment_repo, "experiment-settings.yaml")
 script_working_dir = os.path.join("/home/pi", experiment_repo, "data")
+
+print(client_scripts)
+quit()
 
 # host list can be used to identify individual tiles from group names
 # We don't need it to run ansible playbooks, but it is a first check to see if the tiles are specified correctly
